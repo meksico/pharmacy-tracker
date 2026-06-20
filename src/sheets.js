@@ -57,7 +57,23 @@ export async function appendRow(data) {
     body: JSON.stringify({ values: [objectToRow(data)] }),
   })
   if (!res.ok) throw new Error(`Failed to append row (HTTP ${res.status})`)
-  return res.json()
+  const result = await res.json()
+
+  // Write the row number as the ID (e.g. row 2 = ID 1, row 3 = ID 2 …).
+  // The append response includes updatedRange like "Inventory!A6:J6" — extract the row number.
+  const match = (result.updates?.updatedRange ?? '').match(/!A(\d+):/)
+  if (match) {
+    const sheetRow = parseInt(match[1], 10)
+    const idRange = `${SHEET_NAME}!A${sheetRow}`
+    const idUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(idRange)}?valueInputOption=USER_ENTERED`
+    await fetch(idUrl, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ values: [[sheetRow - 1]] }), // row 2 → ID 1
+    })
+  }
+
+  return result
 }
 
 export async function updateRow(rowIndex, data) {
