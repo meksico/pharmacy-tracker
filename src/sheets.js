@@ -41,6 +41,15 @@ function objectToRow(data) {
   return COLUMNS.map((col) => data[col] ?? '')
 }
 
+// Reads key/value pairs from the Config tab (A=key, B=value, row 1 is header).
+export async function getConfig() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent('Config!A2:B')}`
+  const res = await fetch(url, { headers: authHeaders() })
+  if (!res.ok) return {}
+  const json = await res.json()
+  return Object.fromEntries((json.values ?? []).map(([k, v = '']) => [k, v]))
+}
+
 export async function getRows() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(DATA_RANGE)}`
   const res = await fetch(url, { headers: authHeaders() })

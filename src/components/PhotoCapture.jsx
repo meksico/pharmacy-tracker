@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { getOpenAIKey } from '../config.js'
 
 const MAX_PHOTOS = 5
 
@@ -58,13 +59,42 @@ export default function PhotoCapture({ onResult }) {
     setStatus('recognizing')
     setErrorMsg(null)
     try {
-      const res = await fetch('/api/recognize', {
+      const apiKey = await getOpenAIKey()
+      if (!apiKey) throw new Error('OPENAI_API_KEY not found in the Config sheet tab')
+
+      const imageContent = photos.map((url) => ({
+        type: 'image_url',
+        image_url: { url, detail: 'low' },
+      }))
+
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ images: photos }),
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                ...imageContent,
+                { type: 'text', text: PROMPT },
+              ],
+            },
+          ],
+          max_tokens: 300,
+        }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`)
+
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error?.message ?? `HTTP ${res.status}`)
+
+      let text = json.choices[0].message.content.trim()
+      text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')
+      const data = JSON.parse(text)
+
       onResult(data)
       setPhotos([])
       setStatus('idle')
@@ -73,6 +103,17 @@ export default function PhotoCapture({ onResult }) {
       setErrorMsg(err.message)
     }
   }
+
+const PROMPT = `Analyze this medication or first-aid product packaging photo.
+Return ONLY valid JSON (no markdown, no code fences) with exactly these fields:
+{
+  "title": "product name and dosage/strength (e.g. Ibuprofen 400mg)",
+  "category": "exactly one of: Pain Relief, Wound Care, Cold & Flu, Digestive, Allergy, Other",
+  "conditions": "comma-separated symptoms or conditions this treats (e.g. headache, fever, pain)",
+  "expirationDate": "expiry in YYYY-MM format if visible, otherwise empty string",
+  "notes": "one-sentence product description"
+}
+If you cannot read the packaging clearly, make your best guess and leave expirationDate empty.`
 
   return (
     <div className="photo-capture">
