@@ -8,27 +8,71 @@ const ALLOWED_USER_IDS = [
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets openid email profile'
 
+const SESSION_TOKEN_KEY = 'hp_access_token'
+const SESSION_USER_KEY  = 'hp_user_info'
+const SESSION_EXPIRY_KEY = 'hp_token_expiry'
+
 let tokenClient = null
 let accessToken = null
 let currentUserInfo = null
 
+function saveSession(token, userInfo, expiresIn = 3600) {
+  // Subtract 60s so we don't use a token in its last minute
+  const expiry = Date.now() + (expiresIn - 60) * 1000
+  sessionStorage.setItem(SESSION_TOKEN_KEY, token)
+  sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(userInfo))
+  sessionStorage.setItem(SESSION_EXPIRY_KEY, String(expiry))
+}
+
+function loadSession() {
+  try {
+    const expiry = Number(sessionStorage.getItem(SESSION_EXPIRY_KEY))
+    if (!expiry || Date.now() > expiry) return null
+    const token = sessionStorage.getItem(SESSION_TOKEN_KEY)
+    const userInfo = JSON.parse(sessionStorage.getItem(SESSION_USER_KEY))
+    if (!token || !userInfo) return null
+    return { token, userInfo }
+  } catch {
+    return null
+  }
+}
+
+function clearSession() {
+  sessionStorage.removeItem(SESSION_TOKEN_KEY)
+  sessionStorage.removeItem(SESSION_USER_KEY)
+  sessionStorage.removeItem(SESSION_EXPIRY_KEY)
+}
+
 export function initAuth(onResult) {
+  // Restore from sessionStorage on refresh — no sign-in needed
+  const existing = loadSession()
+  if (existing) {
+    accessToken = existing.token
+    currentUserInfo = existing.userInfo
+    const allowed = ALLOWED_USER_IDS.includes(currentUserInfo.sub)
+    onResult({ allowed, userInfo: currentUserInfo })
+    // Still set up the client so signIn() works if token expires mid-session
+    setupTokenClient(onResult)
+    return
+  }
+
+  setupTokenClient(onResult)
+  onResult({ needsButton: true })
+}
+
+function setupTokenClient(onResult) {
   tokenClient = window.google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPE,
     callback: async (response) => {
       if (response.error) {
-        // 'interaction_required' means silent sign-in isn't possible — show the button.
-        // Any other error is a real failure.
-        const needsButton = response.error === 'interaction_required' ||
-                            response.error === 'user_interaction_required' ||
-                            response.error === 'access_denied'
-        onResult({ needsButton, error: needsButton ? null : response.error })
+        onResult({ needsButton: true })
         return
       }
       accessToken = response.access_token
       try {
         currentUserInfo = await fetchUserInfo()
+        saveSession(accessToken, currentUserInfo, response.expires_in ?? 3600)
         const allowed = ALLOWED_USER_IDS.includes(currentUserInfo.sub)
         onResult({ allowed, userInfo: currentUserInfo })
       } catch {
@@ -36,10 +80,6 @@ export function initAuth(onResult) {
       }
     },
   })
-
-  // Attempt silent sign-in immediately — no popup, no user interaction.
-  // If the user has consented before, this resolves without any visible UI.
-  tokenClient.requestAccessToken({ prompt: '' })
 }
 
 export function signIn() {
@@ -47,6 +87,7 @@ export function signIn() {
 }
 
 export function signOut() {
+  clearSession()
   if (accessToken) {
     window.google.accounts.oauth2.revoke(accessToken)
   }
