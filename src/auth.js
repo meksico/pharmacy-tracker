@@ -18,7 +18,12 @@ export function initAuth(onResult) {
     scope: SCOPE,
     callback: async (response) => {
       if (response.error) {
-        onResult({ error: response.error })
+        // 'interaction_required' means silent sign-in isn't possible — show the button.
+        // Any other error is a real failure.
+        const needsButton = response.error === 'interaction_required' ||
+                            response.error === 'user_interaction_required' ||
+                            response.error === 'access_denied'
+        onResult({ needsButton, error: needsButton ? null : response.error })
         return
       }
       accessToken = response.access_token
@@ -31,10 +36,14 @@ export function initAuth(onResult) {
       }
     },
   })
+
+  // Attempt silent sign-in immediately — no popup, no user interaction.
+  // If the user has consented before, this resolves without any visible UI.
+  tokenClient.requestAccessToken({ prompt: '' })
 }
 
 export function signIn() {
-  tokenClient.requestAccessToken()
+  tokenClient.requestAccessToken({ prompt: 'select_account' })
 }
 
 export function signOut() {

@@ -11,7 +11,13 @@ export default function App() {
     const interval = setInterval(() => {
       if (window.google?.accounts?.oauth2) {
         clearInterval(interval)
-        initAuth(({ allowed, userInfo, error }) => {
+        // Stay on 'loading' while the silent attempt runs.
+        // initAuth fires a prompt:'' request immediately; the callback below handles all outcomes.
+        initAuth(({ allowed, userInfo, needsButton, error }) => {
+          if (needsButton) {
+            setStatus('ready')   // first-time user or consent revoked — show the button
+            return
+          }
           if (error) {
             setStatus('error')
             return
@@ -19,7 +25,6 @@ export default function App() {
           setUserInfo(userInfo)
           setStatus(allowed ? 'allowed' : 'denied')
         })
-        setStatus('ready')
       }
     }, 100)
     return () => clearInterval(interval)
