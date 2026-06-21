@@ -83,8 +83,9 @@ export default function SymptomAdvisor() {
 
       const inventoryText = available.map((r) => {
         const parts = [`- ${r['Title']}`]
-        if (r['Category']) parts.push(`(${r['Category']})`)
-        if (r['Conditions']) parts.push(`— for: ${r['Conditions']}`)
+        if (r['Category']) parts.push(`(${lang === 'uk' ? (r['Category UA'] || r['Category']) : r['Category']})`)
+        const conditions = lang === 'uk' ? (r['Conditions UA'] || r['Conditions']) : r['Conditions']
+        if (conditions) parts.push(`— for: ${conditions}`)
         if (r['Box']) parts.push(`[Box ${r['Box']}]`)
         return parts.join(' ')
       }).join('\n')

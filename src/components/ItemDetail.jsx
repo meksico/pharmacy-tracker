@@ -1,7 +1,7 @@
 import { useLang } from '../i18n/index.jsx'
 
 export default function ItemDetail({ row, onEdit, onClose }) {
-  const { t } = useLang()
+  const { lang, t } = useLang()
 
   function Field({ label, value }) {
     return (
@@ -21,14 +21,14 @@ export default function ItemDetail({ row, onEdit, onClose }) {
         <h2 className="modal-title">{row['Title']}</h2>
 
         <div className="detail-grid">
-          <Field label={t('detail.category')}  value={t('cat.' + row['Category']) || row['Category']} />
-          <Field label={t('detail.conditions')} value={row['Conditions']} />
+          <Field label={t('detail.category')}  value={(lang === 'uk' ? row['Category UA'] : '') || t('cat.' + row['Category']) || row['Category']} />
+          <Field label={t('detail.conditions')} value={(lang === 'uk' ? row['Conditions UA'] : '') || row['Conditions']} />
           <Field label={t('detail.quantity')}   value={qty} />
           <Field label={t('detail.expiration')} value={row['Expiration Date']} />
           <Field label={t('detail.status')}     value={t('status.' + row['Status']) || row['Status']} />
           <Field label={t('detail.box')}        value={row['Box']} />
           <Field label={t('detail.dateAdded')}  value={row['Date Added']} />
-          <Field label={t('detail.notes')}      value={row['Notes']} />
+          <Field label={t('detail.notes')}      value={(lang === 'uk' ? row['Notes UA'] : '') || row['Notes']} />
         </div>
 
         <div className="modal-actions">

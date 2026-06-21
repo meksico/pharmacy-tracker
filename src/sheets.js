@@ -16,9 +16,12 @@ const COLUMNS = [
   'Notes',
   'Status',
   'Box',
+  'Category UA',
+  'Conditions UA',
+  'Notes UA',
 ]
 
-const DATA_RANGE = `${SHEET_NAME}!A2:K`
+const DATA_RANGE = `${SHEET_NAME}!A2:N`
 
 function authHeaders() {
   return {
@@ -41,9 +44,9 @@ function rowToObject(row, index) {
 // Prevents the Sheets API from silently trimming trailing empty cells.
 const COL_DEFAULTS = { Status: 'Active', Box: '1' }
 
-// Maps a named object back to a values array for the Sheets API.
+// Maps a named object back to a values array for the Sheets API (A-K only; UA columns are read-only).
 function objectToRow(data) {
-  return COLUMNS.map((col) => data[col] || COL_DEFAULTS[col] || '')
+  return COLUMNS.slice(0, 11).map((col) => data[col] || COL_DEFAULTS[col] || '')
 }
 
 // Reads key/value pairs from the Config tab (A=key, B=value, row 1 is header).

@@ -16,7 +16,7 @@ function expiryClass(dateStr) {
 }
 
 export default function InventoryList() {
-  const { t } = useLang()
+  const { lang, t } = useLang()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -151,7 +151,7 @@ export default function InventoryList() {
                   onClick={() => handleRowClick(row)}
                 >
                   <td>{row['Title']}</td>
-                  <td>{t('cat.' + row['Category']) || row['Category']}</td>
+                  <td>{(lang === 'uk' ? row['Category UA'] : '') || t('cat.' + row['Category']) || row['Category']}</td>
                   <td>{row['Expiration Date']}</td>
                   <td>{row['Box']}</td>
                 </tr>
