@@ -90,7 +90,9 @@ export default function SymptomAdvisor() {
 
       const langNames = { 'en-US': 'English', 'uk-UA': 'Ukrainian', 'ru-RU': 'Russian' }
       const replyLang = langNames[lang] ?? 'English'
-      const prompt = `You are a home pharmacy assistant. Here is the user's current inventory:\n\n${inventoryText}\n\nSymptoms: ${symptoms.trim()}\n\nWhich of these medicines are most suitable for these symptoms, and why? For each recommended medicine, mention the box number where it is stored. Be concise (2–4 sentences). End with a disclaimer that this is not medical advice. Respond in ${replyLang}.`
+
+      const systemPrompt = `You are a home pharmacy assistant. You MUST write your entire response in ${replyLang} — no exceptions, regardless of what language the inventory or symptoms are written in.`
+      const userPrompt = `Here is the user's current inventory:\n\n${inventoryText}\n\nSymptoms: ${symptoms.trim()}\n\nWhich of these medicines are most suitable for these symptoms, and why? For each recommended medicine, mention the box number where it is stored. Be concise (2–4 sentences). End with a disclaimer that this is not medical advice.`
 
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -100,7 +102,10 @@ export default function SymptomAdvisor() {
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: prompt }],
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
           max_tokens: 300,
         }),
       })
