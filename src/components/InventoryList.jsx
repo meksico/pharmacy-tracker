@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getRows } from '../sheets.js'
 import ItemForm from './ItemForm.jsx'
+import ItemDetail from './ItemDetail.jsx'
 
 function expiryClass(dateStr) {
   if (!dateStr) return ''
@@ -20,6 +21,7 @@ export default function InventoryList() {
   const [error, setError] = useState(null)
   const [formMode, setFormMode] = useState(null) // null | 'add' | 'edit'
   const [editTarget, setEditTarget] = useState(null)
+  const [detailTarget, setDetailTarget] = useState(null)
   const [search, setSearch] = useState('')
 
   async function load() {
@@ -50,6 +52,15 @@ export default function InventoryList() {
     setFormMode(null)
     setEditTarget(null)
     load()
+  }
+
+  function handleRowClick(row) {
+    setDetailTarget(row)
+  }
+
+  function handleDetailEdit(row) {
+    setDetailTarget(null)
+    handleEdit(row)
   }
 
   if (formMode) {
@@ -109,34 +120,34 @@ export default function InventoryList() {
               <tr>
                 <th>Title</th>
                 <th>Category</th>
-                <th>Conditions / Symptoms</th>
-                <th>Qty</th>
                 <th>Expires</th>
-                <th>Status</th>
                 <th>Box</th>
-                <th>Notes</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
               {visibleRows.map((row) => (
-                <tr key={row._rowIndex} className={expiryClass(row['Expiration Date'])}>
+                <tr
+                  key={row._rowIndex}
+                  className={expiryClass(row['Expiration Date'])}
+                  onClick={() => handleRowClick(row)}
+                >
                   <td>{row['Title']}</td>
                   <td>{row['Category']}</td>
-                  <td>{row['Conditions']}</td>
-                  <td>{row['Quantity']}{row['Unit'] ? ` ${row['Unit']}` : ''}</td>
                   <td>{row['Expiration Date']}</td>
-                  <td>{row['Status']}</td>
                   <td>{row['Box']}</td>
-                  <td className="td-notes">{row['Notes']}</td>
-                  <td>
-                    <button className="btn-edit" onClick={() => handleEdit(row)}>Edit</button>
-                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {detailTarget && (
+        <ItemDetail
+          row={detailTarget}
+          onEdit={handleDetailEdit}
+          onClose={() => setDetailTarget(null)}
+        />
       )}
     </div>
   )
