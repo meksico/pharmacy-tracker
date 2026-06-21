@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { getRows } from '../sheets.js'
+import { getRows, getHistory, appendHistory } from '../sheets.js'
 import { getOpenAIKey } from '../config.js'
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -12,9 +12,12 @@ export default function SymptomAdvisor() {
   const [status, setStatus] = useState('idle') // idle | loading | done | error
   const [answer, setAnswer] = useState(null)
   const [errorMsg, setErrorMsg] = useState(null)
+  const [history, setHistory] = useState([])
+  const [activeHistoryIdx, setActiveHistoryIdx] = useState(null)
   const recogRef = useRef(null)
 
   useEffect(() => {
+    getHistory().then(setHistory).catch(() => {})
     return () => recogRef.current?.stop()
   }, [])
 
@@ -97,8 +100,17 @@ export default function SymptomAdvisor() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error?.message ?? `HTTP ${res.status}`)
 
-      setAnswer(json.choices[0].message.content.trim())
+      const text = json.choices[0].message.content.trim()
+      setAnswer(text)
       setStatus('done')
+
+      const entry = { timestamp: new Date().toISOString(), symptoms: symptoms.trim(), answer: text }
+      appendHistory(entry).catch(() => {})
+      setHistory((prev) => {
+        const updated = [...prev, entry]
+        return updated.slice(-20)
+      })
+      setActiveHistoryIdx(null)
     } catch (err) {
       setErrorMsg(err.message)
       setStatus('error')
@@ -163,6 +175,39 @@ export default function SymptomAdvisor() {
         <p className="error" style={{ marginTop: '1rem' }}>
           {errorMsg}
         </p>
+      )}
+
+      {history.length > 0 && (
+        <div className="advisor-history">
+          <p className="advisor-history-title">Recent queries</p>
+          {[...history].reverse().map((entry, i) => {
+            const idx = history.length - 1 - i
+            const isActive = activeHistoryIdx === idx
+            const date = new Date(entry.timestamp)
+            const label = isNaN(date) ? entry.timestamp : date.toLocaleString()
+            return (
+              <div
+                key={entry.timestamp + i}
+                className={`history-entry${isActive ? ' history-entry--active' : ''}`}
+                onClick={() => {
+                  if (isActive) {
+                    setActiveHistoryIdx(null)
+                    setAnswer(null)
+                    setStatus('idle')
+                  } else {
+                    setActiveHistoryIdx(idx)
+                    setSymptoms(entry.symptoms)
+                    setAnswer(entry.answer)
+                    setStatus('done')
+                  }
+                }}
+              >
+                <span className="history-entry-time">{label}</span>
+                <span className="history-entry-preview">{entry.symptoms}</span>
+              </div>
+            )
+          })}
+        </div>
       )}
     </div>
   )

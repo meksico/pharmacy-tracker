@@ -630,6 +630,58 @@ textarea:focus {
   cursor: pointer;
 }
 
+/* ── Advisor history ─────────────────────────────────── */
+
+.advisor-history {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+}
+
+.advisor-history-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  margin-bottom: 0.6rem;
+}
+
+.history-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin-bottom: 0.35rem;
+  background: #f8fafc;
+}
+
+.history-entry:hover {
+  background: #eef4ff;
+  border-color: #bfdbfe;
+}
+
+.history-entry--active {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.history-entry-time {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.history-entry-preview {
+  font-size: 0.85rem;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Mobile ──────────────────────────────────────────── */
 
 @media (max-width: 640px) {

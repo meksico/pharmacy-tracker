@@ -90,6 +90,28 @@ export async function appendRow(data) {
   return result
 }
 
+const HISTORY_SHEET = 'History'
+const HISTORY_RANGE = `${HISTORY_SHEET}!A2:C`
+
+export async function getHistory() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(HISTORY_RANGE)}`
+  const res = await fetch(url, { headers: authHeaders() })
+  if (!res.ok) return []
+  const json = await res.json()
+  const rows = json.values ?? []
+  return rows.slice(-20).map(([timestamp = '', symptoms = '', answer = '']) => ({ timestamp, symptoms, answer }))
+}
+
+export async function appendHistory({ symptoms, answer }) {
+  const timestamp = new Date().toISOString()
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(HISTORY_RANGE)}:append?valueInputOption=USER_ENTERED`
+  await fetch(url, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ values: [[timestamp, symptoms, answer]] }),
+  })
+}
+
 export async function updateRow(rowIndex, data) {
   // rowIndex is 0-based in the values array; sheet row = rowIndex + 2 (row 1 is the header).
   const sheetRow = rowIndex + 2
