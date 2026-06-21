@@ -7,6 +7,7 @@ import ExpiryDashboard from './components/ExpiryDashboard.jsx'
 export default function App() {
   const [status, setStatus] = useState('loading')
   const [userInfo, setUserInfo] = useState(null)
+  const [tab, setTab] = useState('inventory')
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -89,9 +90,6 @@ export default function App() {
       </div>
     )
   }
-
-  // tab state lives here so switching tabs doesn't reset InventoryList search/sort
-  const [tab, setTab] = useState('inventory')
 
   return (
     <div className="app">
