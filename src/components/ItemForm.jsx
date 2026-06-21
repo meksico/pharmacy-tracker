@@ -14,19 +14,22 @@ const EMPTY_FORM = {
   'Expiration Date': '',
   Notes: '',
   Status: 'Active',
+  Box: '1',
 }
 
+const BOX_KEY = 'hp_last_box'
+
 export default function ItemForm({ mode, initialData, onSave, onCancel }) {
-  const [form, setForm] = useState(
-    initialData
-      ? { ...initialData }
-      : { ...EMPTY_FORM }
-  )
+  const [form, setForm] = useState(() => {
+    if (initialData) return { ...initialData }
+    return { ...EMPTY_FORM, Box: localStorage.getItem(BOX_KEY) ?? '1' }
+  })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
 
   function handleChange(e) {
     const { name, value } = e.target
+    if (name === 'Box') localStorage.setItem(BOX_KEY, value)
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
@@ -52,11 +55,13 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
   function handlePhotoResult(data) {
     setForm((prev) => ({
       ...prev,
-      ...(data.title        && { Title: data.title }),
-      ...(data.category     && { Category: data.category }),
-      ...(data.conditions   && { Conditions: data.conditions }),
+      ...(data.title          && { Title: data.title }),
+      ...(data.category       && { Category: data.category }),
+      ...(data.conditions     && { Conditions: data.conditions }),
+      ...(data.quantity       && { Quantity: data.quantity }),
+      ...(data.unit           && { Unit: data.unit }),
       ...(data.expirationDate && { 'Expiration Date': data.expirationDate }),
-      ...(data.notes        && { Notes: data.notes }),
+      ...(data.notes          && { Notes: data.notes }),
     }))
   }
 
@@ -129,12 +134,24 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
           />
         </label>
 
-        <label>
-          Status
-          <select name="Status" value={form['Status']} onChange={handleChange}>
-            {STATUSES.map((s) => <option key={s}>{s}</option>)}
-          </select>
-        </label>
+        <div className="form-row">
+          <label>
+            Status
+            <select name="Status" value={form['Status']} onChange={handleChange}>
+              {STATUSES.map((s) => <option key={s}>{s}</option>)}
+            </select>
+          </label>
+          <label>
+            Box #
+            <input
+              name="Box"
+              type="number"
+              min="1"
+              value={form['Box']}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
 
         <label>
           Notes

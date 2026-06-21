@@ -110,10 +110,12 @@ Return ONLY valid JSON (no markdown, no code fences) with exactly these fields:
   "title": "product name and dosage/strength (e.g. Ibuprofen 400mg)",
   "category": "exactly one of: Pain Relief, Wound Care, Cold & Flu, Digestive, Allergy, Other",
   "conditions": "comma-separated symptoms or conditions this treats (e.g. headache, fever, pain)",
+  "quantity": "numeric count visible on packaging (e.g. 30, 200, 10), or empty string if not visible",
+  "unit": "unit of measurement (e.g. tablets, capsules, ml, g, pcs), or empty string if not visible",
   "expirationDate": "expiry in YYYY-MM format if visible, otherwise empty string",
   "notes": "one-sentence product description"
 }
-If you cannot read the packaging clearly, make your best guess and leave expirationDate empty.`
+If you cannot read the packaging clearly, make your best guess and leave unknown fields as empty strings.`
 
   return (
     <div className="photo-capture">

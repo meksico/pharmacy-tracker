@@ -101,6 +101,7 @@ export default function InventoryList() {
                 <th>Qty</th>
                 <th>Expires</th>
                 <th>Status</th>
+                <th>Box</th>
                 <th>Notes</th>
                 <th></th>
               </tr>
@@ -114,6 +115,7 @@ export default function InventoryList() {
                   <td>{row['Quantity']}{row['Unit'] ? ` ${row['Unit']}` : ''}</td>
                   <td>{row['Expiration Date']}</td>
                   <td>{row['Status']}</td>
+                  <td>{row['Box']}</td>
                   <td className="td-notes">{row['Notes']}</td>
                   <td>
                     <button className="btn-edit" onClick={() => handleEdit(row)}>Edit</button>
