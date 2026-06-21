@@ -8,6 +8,7 @@ const hasSpeech = !!SpeechRecognition
 export default function SymptomAdvisor() {
   const [symptoms, setSymptoms] = useState('')
   const [listening, setListening] = useState(false)
+  const [lang, setLang] = useState('en-US')
   const [status, setStatus] = useState('idle') // idle | loading | done | error
   const [answer, setAnswer] = useState(null)
   const [errorMsg, setErrorMsg] = useState(null)
@@ -24,7 +25,7 @@ export default function SymptomAdvisor() {
       return
     }
     const recog = new SpeechRecognition()
-    recog.lang = 'en-US'
+    recog.lang = lang
     recog.interimResults = false
     recog.onresult = (e) => {
       const transcript = Array.from(e.results).map(r => r[0].transcript).join(' ')
@@ -99,14 +100,27 @@ export default function SymptomAdvisor() {
           onChange={(e) => setSymptoms(e.target.value)}
         />
         {hasSpeech && (
-          <button
-            type="button"
-            className={`btn-mic${listening ? ' btn-mic--active' : ''}`}
-            onClick={toggleMic}
-            title={listening ? 'Stop recording' : 'Speak your symptoms'}
-          >
-            {listening ? '⏹' : '🎙'}
-          </button>
+          <div className="mic-controls">
+            <select
+              className="lang-select"
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              disabled={listening}
+              title="Speech language"
+            >
+              <option value="en-US">EN</option>
+              <option value="uk-UA">UA</option>
+              <option value="ru-RU">RU</option>
+            </select>
+            <button
+              type="button"
+              className={`btn-mic${listening ? ' btn-mic--active' : ''}`}
+              onClick={toggleMic}
+              title={listening ? 'Stop recording' : 'Speak your symptoms'}
+            >
+              {listening ? '⏹' : '🎙'}
+            </button>
+          </div>
         )}
       </div>
 

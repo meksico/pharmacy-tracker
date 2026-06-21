@@ -162,6 +162,23 @@ main {
   font-family: inherit;
 }
 
+.mic-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.lang-select {
+  padding: 0.25rem 0.35rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  text-align: center;
+  background: white;
+  cursor: pointer;
+}
+
 .btn-mic {
   font-size: 1.25rem;
   padding: 0.45rem 0.65rem;
@@ -169,7 +186,6 @@ main {
   border-radius: 6px;
   background: white;
   line-height: 1;
-  flex-shrink: 0;
 }
 
 .btn-mic--active {
