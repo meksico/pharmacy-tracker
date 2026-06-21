@@ -677,6 +677,20 @@ textarea:focus {
     flex: 1 1 100%;
   }
 
+  .advisor-input-row {
+    flex-direction: column;
+  }
+
+  .mic-controls {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .advisor-textarea {
+    font-size: 1rem;
+    resize: none;
+  }
+
   .form-container {
     padding: 1rem;
     border-radius: 0;
