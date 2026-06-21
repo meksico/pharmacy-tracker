@@ -8,7 +8,7 @@ const hasSpeech = !!SpeechRecognition
 export default function SymptomAdvisor() {
   const [symptoms, setSymptoms] = useState('')
   const [listening, setListening] = useState(false)
-  const [lang, setLang] = useState('en-US')
+  const [lang, setLang] = useState(() => localStorage.getItem('hp_advisor_lang') ?? 'en-US')
   const [status, setStatus] = useState('idle') // idle | loading | done | error
   const [answer, setAnswer] = useState(null)
   const [errorMsg, setErrorMsg] = useState(null)
@@ -58,7 +58,9 @@ export default function SymptomAdvisor() {
         return parts.join(' ')
       }).join('\n')
 
-      const prompt = `You are a home pharmacy assistant. Here is the user's current inventory:\n\n${inventoryText}\n\nSymptoms: ${symptoms.trim()}\n\nWhich of these medicines are most suitable for these symptoms, and why? Be concise (2–4 sentences). End with: "This is not medical advice — consult a doctor for serious symptoms."`
+      const langNames = { 'en-US': 'English', 'uk-UA': 'Ukrainian', 'ru-RU': 'Russian' }
+      const replyLang = langNames[lang] ?? 'English'
+      const prompt = `You are a home pharmacy assistant. Here is the user's current inventory:\n\n${inventoryText}\n\nSymptoms: ${symptoms.trim()}\n\nWhich of these medicines are most suitable for these symptoms, and why? Be concise (2–4 sentences). End with a disclaimer that this is not medical advice. Respond in ${replyLang}.`
 
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -104,7 +106,7 @@ export default function SymptomAdvisor() {
             <select
               className="lang-select"
               value={lang}
-              onChange={(e) => setLang(e.target.value)}
+              onChange={(e) => { setLang(e.target.value); localStorage.setItem('hp_advisor_lang', e.target.value) }}
               disabled={listening}
               title="Speech language"
             >
