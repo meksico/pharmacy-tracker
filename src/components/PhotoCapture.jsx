@@ -145,16 +145,6 @@ If you cannot read the packaging clearly, make your best guess and leave unknown
       )}
 
       <div className="photo-buttons">
-        {photos.length < MAX_PHOTOS && (
-          <>
-            <button type="button" className="btn-photo" onClick={() => openPicker('file')}>
-              {photos.length === 0 ? 'Upload photo' : '+ Add photo'}
-            </button>
-            <button type="button" className="btn-photo" onClick={() => openPicker('camera')}>
-              {photos.length === 0 ? 'Take photo' : '+ Take photo'}
-            </button>
-          </>
-        )}
         {photos.length > 0 && (
           <button
             type="button"
@@ -163,6 +153,11 @@ If you cannot read the packaging clearly, make your best guess and leave unknown
             disabled={status === 'recognizing'}
           >
             {status === 'recognizing' ? 'Recognising…' : 'Fill form from photos'}
+          </button>
+        )}
+        {photos.length < MAX_PHOTOS && (
+          <button type="button" className="btn-photo btn-photo--camera" onClick={() => openPicker('camera')}>
+            {photos.length === 0 ? 'Take photo' : '+ Take photo'}
           </button>
         )}
       </div>

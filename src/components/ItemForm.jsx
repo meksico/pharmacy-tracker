@@ -194,14 +194,15 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
           <button type="button" className="btn-cancel" onClick={onCancel} disabled={!!saving}>
             Cancel
           </button>
-          {mode === 'add' && (
+          {mode === 'add' ? (
             <button type="button" className="btn-secondary" onClick={handleAddNext} disabled={!!saving}>
               {saving === 'next' ? 'Saving…' : 'Add next item'}
             </button>
+          ) : (
+            <button type="submit" className="btn-primary" disabled={!!saving}>
+              {saving === 'save' ? 'Saving…' : submitLabel}
+            </button>
           )}
-          <button type="submit" className="btn-primary" disabled={!!saving}>
-            {saving === 'save' ? 'Saving…' : submitLabel}
-          </button>
         </div>
       </form>
     </div>
