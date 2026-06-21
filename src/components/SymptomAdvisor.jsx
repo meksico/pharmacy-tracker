@@ -21,17 +21,36 @@ export default function SymptomAdvisor() {
   function toggleMic() {
     if (listening) {
       recogRef.current?.stop()
-      setListening(false)
       return
     }
     const recog = new SpeechRecognition()
     recog.lang = lang
-    recog.interimResults = false
+    recog.interimResults = true  // iOS never fires final result without this
+    recog.continuous = false
+
+    let sessionText = ''
+
     recog.onresult = (e) => {
-      const transcript = Array.from(e.results).map(r => r[0].transcript).join(' ')
-      setSymptoms((prev) => (prev ? prev + ' ' + transcript : transcript).trim())
+      let final = ''
+      let interim = ''
+      for (let i = 0; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          final += e.results[i][0].transcript
+        } else {
+          interim += e.results[i][0].transcript
+        }
+      }
+      // Keep the best transcript seen so far; commit on onend
+      sessionText = final || interim
     }
-    recog.onend = () => setListening(false)
+
+    recog.onend = () => {
+      setListening(false)
+      if (sessionText) {
+        setSymptoms((prev) => (prev ? prev + ' ' + sessionText : sessionText).trim())
+      }
+    }
+
     recog.onerror = () => setListening(false)
     recog.start()
     recogRef.current = recog
