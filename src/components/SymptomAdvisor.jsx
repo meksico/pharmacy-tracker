@@ -5,6 +5,14 @@ import { getOpenAIKey } from '../config.js'
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 const hasSpeech = !!SpeechRecognition
 
+function fmtTimestamp(iso) {
+  const d = new Date(iso)
+  if (isNaN(d)) return iso
+  const m = String(d.getMinutes()).padStart(2, '0')
+  const s = String(d.getSeconds()).padStart(2, '0')
+  return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()} ${d.getHours()}:${m}:${s}`
+}
+
 export default function SymptomAdvisor() {
   const [symptoms, setSymptoms] = useState('')
   const [listening, setListening] = useState(false)
@@ -183,8 +191,7 @@ export default function SymptomAdvisor() {
           {[...history].reverse().map((entry, i) => {
             const idx = history.length - 1 - i
             const isActive = activeHistoryIdx === idx
-            const date = new Date(entry.timestamp)
-            const label = isNaN(date) ? entry.timestamp : date.toLocaleString()
+            const label = fmtTimestamp(entry.timestamp)
             return (
               <div
                 key={entry.timestamp + i}
