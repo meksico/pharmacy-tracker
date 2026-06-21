@@ -19,6 +19,11 @@ const EMPTY_FORM = {
 
 const BOX_KEY = 'hp_last_box'
 
+function filledClass(val) {
+  if (val == null || val === '') return ''
+  return 'field--filled'
+}
+
 export default function ItemForm({ mode, initialData, onSave, onCancel }) {
   const [form, setForm] = useState(() => {
     if (initialData) return { ...initialData }
@@ -28,6 +33,8 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
   const [error, setError] = useState(null)
   const [savedCount, setSavedCount] = useState(0)
   const titleRef = useRef(null)
+
+  const canAddNext = !!form['Title'].trim() && !!form['Expiration Date']
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -84,18 +91,19 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
     }))
   }
 
-  const title = mode === 'add' ? 'Add item' : 'Edit item'
-  const submitLabel = mode === 'add' ? 'Add item' : 'Save changes'
+  const pageTitle = mode === 'add' ? 'Add item' : 'Edit item'
+  const submitLabel = 'Save changes'
 
   return (
     <div className="form-container">
-      <h2>{title}</h2>
+      <h2>{pageTitle}</h2>
       <form onSubmit={handleSubmit}>
 
         <label>
           Title *
           <input
             ref={titleRef}
+            className={filledClass(form['Title'])}
             name="Title"
             value={form['Title']}
             onChange={handleChange}
@@ -106,7 +114,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
 
         <label>
           Category
-          <select name="Category" value={form['Category']} onChange={handleChange}>
+          <select className={filledClass(form['Category'])} name="Category" value={form['Category']} onChange={handleChange}>
             {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
           </select>
         </label>
@@ -114,6 +122,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
         <label>
           Conditions / Symptoms
           <input
+            className={filledClass(form['Conditions'])}
             name="Conditions"
             value={form['Conditions']}
             onChange={handleChange}
@@ -125,6 +134,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
           <label>
             Quantity
             <input
+              className={filledClass(form['Quantity'])}
               name="Quantity"
               type="number"
               min="0"
@@ -135,6 +145,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
           <label>
             Unit
             <input
+              className={filledClass(form['Unit'])}
               name="Unit"
               value={form['Unit']}
               onChange={handleChange}
@@ -144,8 +155,9 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
         </div>
 
         <label>
-          Expiration Date
+          Expiration Date{mode === 'add' ? ' *' : ''}
           <input
+            className={filledClass(form['Expiration Date'])}
             name="Expiration Date"
             type="month"
             value={form['Expiration Date']}
@@ -156,13 +168,14 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
         <div className="form-row">
           <label>
             Status
-            <select name="Status" value={form['Status']} onChange={handleChange}>
+            <select className={filledClass(form['Status'])} name="Status" value={form['Status']} onChange={handleChange}>
               {STATUSES.map((s) => <option key={s}>{s}</option>)}
             </select>
           </label>
           <label>
             Box #
             <input
+              className={filledClass(form['Box'])}
               name="Box"
               type="number"
               min="1"
@@ -175,6 +188,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
         <label>
           Notes
           <textarea
+            className={filledClass(form['Notes'])}
             name="Notes"
             value={form['Notes']}
             onChange={handleChange}
@@ -195,7 +209,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
             Cancel
           </button>
           {mode === 'add' ? (
-            <button type="button" className="btn-secondary" onClick={handleAddNext} disabled={!!saving}>
+            <button type="button" className="btn-secondary" onClick={handleAddNext} disabled={!!saving || !canAddNext}>
               {saving === 'next' ? 'Saving…' : 'Add next item'}
             </button>
           ) : (
