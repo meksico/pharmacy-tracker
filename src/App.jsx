@@ -11,14 +11,17 @@ export default function App() {
   const [tab, setTab] = useState('advisor')
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      setStatus('blocked')
+    }, 6000)
+
     const interval = setInterval(() => {
       if (window.google?.accounts?.oauth2) {
         clearInterval(interval)
-        // Stay on 'loading' while the silent attempt runs.
-        // initAuth fires a prompt:'' request immediately; the callback below handles all outcomes.
+        clearTimeout(timeout)
         initAuth(({ allowed, userInfo, needsButton, error }) => {
           if (needsButton) {
-            setStatus('ready')   // first-time user or consent revoked — show the button
+            setStatus('ready')
             return
           }
           if (error) {
@@ -30,7 +33,8 @@ export default function App() {
         })
       }
     }, 100)
-    return () => clearInterval(interval)
+
+    return () => { clearInterval(interval); clearTimeout(timeout) }
   }, [])
 
   function handleSignIn() {
@@ -88,6 +92,17 @@ export default function App() {
         <h1>Sign-in Error</h1>
         <p>Something went wrong during sign-in. Please try again.</p>
         <button className="btn-primary" onClick={() => setStatus('ready')}>Retry</button>
+      </div>
+    )
+  }
+
+  if (status === 'blocked') {
+    return (
+      <div className="center-screen">
+        <h1>Sign-in Unavailable</h1>
+        <p>Google sign-in script could not load. This is usually caused by a content blocker or VPN.</p>
+        <p>Try disabling Safari extensions: <strong>Settings → Safari → Extensions</strong></p>
+        <button className="btn-primary" onClick={() => window.location.reload()}>Retry</button>
       </div>
     )
   }
