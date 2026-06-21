@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { getRows, getHistory, appendHistory } from '../sheets.js'
 import { getOpenAIKey } from '../config.js'
 import { getUserInfo } from '../auth.js'
+import { useLang } from '../i18n/index.jsx'
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 const hasSpeech = !!SpeechRecognition
@@ -15,9 +16,9 @@ function fmtTimestamp(iso) {
 }
 
 export default function SymptomAdvisor() {
+  const { lang, t } = useLang()
   const [symptoms, setSymptoms] = useState('')
   const [listening, setListening] = useState(false)
-  const [lang, setLang] = useState(() => localStorage.getItem('hp_advisor_lang') ?? 'en-US')
   const [status, setStatus] = useState('idle') // idle | loading | done | error
   const [answer, setAnswer] = useState(null)
   const [errorMsg, setErrorMsg] = useState(null)
@@ -36,7 +37,7 @@ export default function SymptomAdvisor() {
       return
     }
     const recog = new SpeechRecognition()
-    recog.lang = lang
+    recog.lang = t('adv.speechLang')
     recog.interimResults = true  // iOS never fires final result without this
     recog.continuous = false
 
@@ -52,7 +53,6 @@ export default function SymptomAdvisor() {
           interim += e.results[i][0].transcript
         }
       }
-      // Keep the best transcript seen so far; commit on onend
       sessionText = final || interim
     }
 
@@ -89,9 +89,7 @@ export default function SymptomAdvisor() {
         return parts.join(' ')
       }).join('\n')
 
-      const langNames = { 'en-US': 'English', 'uk-UA': 'Ukrainian', 'ru-RU': 'Russian' }
-      const replyLang = langNames[lang] ?? 'English'
-
+      const replyLang = t('adv.replyLang')
       const systemPrompt = `You are a home pharmacy assistant. You MUST write your entire response in ${replyLang} — no exceptions, regardless of what language the inventory or symptoms are written in.`
       const userPrompt = `Here is the user's current inventory:\n\n${inventoryText}\n\nSymptoms: ${symptoms.trim()}\n\nWhich of these medicines are most suitable for these symptoms, and why? For each recommended medicine, mention the box number where it is stored. Be concise (2–4 sentences). End with a disclaimer that this is not medical advice.`
 
@@ -135,37 +133,24 @@ export default function SymptomAdvisor() {
 
   return (
     <div className="advisor">
-      <h2 className="advisor-title">Symptom Advisor</h2>
-      <p className="advisor-hint">
-        Describe your symptoms and the assistant will suggest what you have in your pharmacy.
-      </p>
+      <h2 className="advisor-title">{t('adv.title')}</h2>
+      <p className="advisor-hint">{t('adv.hint')}</p>
 
       <div className="advisor-input-row">
         <textarea
           className="advisor-textarea"
           rows={3}
-          placeholder="e.g. headache and mild fever since this morning…"
+          placeholder={t('adv.placeholder')}
           value={symptoms}
           onChange={(e) => setSymptoms(e.target.value)}
         />
         {hasSpeech && (
           <div className="mic-controls">
-            <select
-              className="lang-select"
-              value={lang}
-              onChange={(e) => { setLang(e.target.value); localStorage.setItem('hp_advisor_lang', e.target.value) }}
-              disabled={listening}
-              title="Speech language"
-            >
-              <option value="en-US">EN</option>
-              <option value="uk-UA">UA</option>
-              <option value="ru-RU">RU</option>
-            </select>
             <button
               type="button"
               className={`btn-mic${listening ? ' btn-mic--active' : ''}`}
               onClick={toggleMic}
-              title={listening ? 'Stop recording' : 'Speak your symptoms'}
+              title={listening ? t('adv.stopRecording') : t('adv.startRecording')}
             >
               {listening ? '⏹' : '🎙'}
             </button>
@@ -178,7 +163,7 @@ export default function SymptomAdvisor() {
         onClick={handleSubmit}
         disabled={status === 'loading' || !symptoms.trim()}
       >
-        {status === 'loading' ? 'Checking…' : 'Find medicine'}
+        {status === 'loading' ? t('adv.checking') : t('adv.find')}
       </button>
 
       {status === 'done' && answer && (
@@ -195,7 +180,7 @@ export default function SymptomAdvisor() {
 
       {history.length > 0 && (
         <div className="advisor-history">
-          <p className="advisor-history-title">Recent queries</p>
+          <p className="advisor-history-title">{t('adv.history')}</p>
           {[...history].reverse().map((entry, i) => {
             const idx = history.length - 1 - i
             const isActive = activeHistoryIdx === idx

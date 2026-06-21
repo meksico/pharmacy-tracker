@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getRows } from '../sheets.js'
+import { useLang } from '../i18n/index.jsx'
 import ItemDetail from './ItemDetail.jsx'
 
 function parseExpiry(dateStr) {
@@ -14,6 +15,7 @@ function daysUntil(date) {
 }
 
 export default function ExpiryDashboard() {
+  const { t } = useLang()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -27,8 +29,8 @@ export default function ExpiryDashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p className="state-msg">Loading…</p>
-  if (error) return <p className="error">Could not load inventory: {error}</p>
+  if (loading) return <p className="state-msg">{t('inv.loading')}</p>
+  if (error) return <p className="error">{t('expiry.loadError', { error })}</p>
 
   const expired = rows
     .filter((r) => { const d = parseExpiry(r['Expiration Date']); return d && daysUntil(d) < 0 })
@@ -39,13 +41,13 @@ export default function ExpiryDashboard() {
     .sort((a, b) => parseExpiry(a['Expiration Date']) - parseExpiry(b['Expiration Date']))
 
   if (expired.length === 0 && soon.length === 0) {
-    return <p className="state-msg">No expired or expiring items. All good!</p>
+    return <p className="state-msg">{t('expiry.allGood')}</p>
   }
 
   return (
     <div className="expiry-dashboard">
-      <Section title="Expired" rows={expired} variant="expired" onRowClick={setDetailTarget} />
-      <Section title="Expiring within 30 days" rows={soon} variant="soon" onRowClick={setDetailTarget} />
+      <Section title={t('expiry.sectionExpired')} rows={expired} variant="expired" onRowClick={setDetailTarget} t={t} />
+      <Section title={t('expiry.sectionSoon')} rows={soon} variant="soon" onRowClick={setDetailTarget} t={t} />
 
       {detailTarget && (
         <ItemDetail
@@ -58,7 +60,7 @@ export default function ExpiryDashboard() {
   )
 }
 
-function Section({ title, rows, variant, onRowClick }) {
+function Section({ title, rows, variant, onRowClick, t }) {
   if (rows.length === 0) return null
   return (
     <section className={`expiry-section expiry-section--${variant}`}>
@@ -67,10 +69,10 @@ function Section({ title, rows, variant, onRowClick }) {
         <table className="inventory-table">
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Expires</th>
-              <th>Box</th>
+              <th>{t('inv.colTitle')}</th>
+              <th>{t('inv.colCategory')}</th>
+              <th>{t('inv.colExpires')}</th>
+              <th>{t('inv.colBox')}</th>
             </tr>
           </thead>
           <tbody>
@@ -81,7 +83,7 @@ function Section({ title, rows, variant, onRowClick }) {
                 onClick={() => onRowClick(row)}
               >
                 <td>{row['Title']}</td>
-                <td>{row['Category']}</td>
+                <td>{t('cat.' + row['Category']) || row['Category']}</td>
                 <td>{row['Expiration Date']}</td>
                 <td>{row['Box']}</td>
               </tr>

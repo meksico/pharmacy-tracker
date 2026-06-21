@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { appendRow, updateRow } from '../sheets.js'
 import { getOpenAIKey } from '../config.js'
+import { useLang } from '../i18n/index.jsx'
 import PhotoCapture from './PhotoCapture.jsx'
 
 const CATEGORIES = ['Pain Relief', 'Wound Care', 'Cold & Flu', 'Digestive', 'Allergy', 'Other']
@@ -58,6 +59,8 @@ function filledClass(val) {
 }
 
 export default function ItemForm({ mode, initialData, onSave, onCancel }) {
+  const { t } = useLang()
+
   const [form, setForm] = useState(() => {
     if (initialData) return { ...initialData }
     return { ...EMPTY_FORM, Box: localStorage.getItem(BOX_KEY) ?? '1' }
@@ -184,47 +187,45 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
     }
   }
 
-  const pageTitle = mode === 'add' ? 'Add item' : 'Edit item'
-
   return (
     <div className="form-container">
-      <h2>{pageTitle}</h2>
+      <h2>{mode === 'add' ? t('form.addTitle') : t('form.editTitle')}</h2>
       <form ref={formRef} onSubmit={handleSubmit}>
 
         <label>
-          Title *
+          {t('form.labelTitle')}{mode === 'add' ? ' *' : ''}
           <input
             ref={titleRef}
             className={filledClass(form['Title'])}
             name="Title"
             value={form['Title']}
             onChange={handleChange}
-            placeholder="e.g. Ibuprofen 400mg"
+            placeholder={t('form.phTitle')}
             required
           />
         </label>
 
         <label>
-          Category
+          {t('form.labelCategory')}
           <select className={filledClass(form['Category'])} name="Category" value={form['Category']} onChange={handleChange}>
-            {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+            {CATEGORIES.map((c) => <option key={c} value={c}>{t('cat.' + c)}</option>)}
           </select>
         </label>
 
         <label>
-          Conditions / Symptoms
+          {t('form.labelConditions')}
           <input
             className={filledClass(form['Conditions'])}
             name="Conditions"
             value={form['Conditions']}
             onChange={handleChange}
-            placeholder="e.g. headache, fever, pain"
+            placeholder={t('form.phConditions')}
           />
         </label>
 
         <div className="form-row">
           <label>
-            Quantity
+            {t('form.labelQuantity')}
             <input
               className={filledClass(form['Quantity'])}
               name="Quantity"
@@ -235,19 +236,19 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
             />
           </label>
           <label>
-            Unit
+            {t('form.labelUnit')}
             <input
               className={filledClass(form['Unit'])}
               name="Unit"
               value={form['Unit']}
               onChange={handleChange}
-              placeholder="tablets, ml, pcs…"
+              placeholder={t('form.phUnit')}
             />
           </label>
         </div>
 
         <label>
-          Expiration Date{mode === 'add' ? ' *' : ''}
+          {t('form.labelExpDate')}{mode === 'add' ? ' *' : ''}
           <input
             className={filledClass(form['Expiration Date'])}
             name="Expiration Date"
@@ -259,13 +260,13 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
 
         <div className="form-row">
           <label>
-            Status
+            {t('form.labelStatus')}
             <select className={filledClass(form['Status'])} name="Status" value={form['Status']} onChange={handleChange}>
-              {STATUSES.map((s) => <option key={s}>{s}</option>)}
+              {STATUSES.map((s) => <option key={s} value={s}>{t('status.' + s)}</option>)}
             </select>
           </label>
           <label>
-            Box #
+            {t('form.labelBox')}
             <input
               className={filledClass(form['Box'])}
               name="Box"
@@ -278,22 +279,22 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
         </div>
 
         <label>
-          Notes
+          {t('form.labelNotes')}
           <textarea
             className={filledClass(form['Notes'])}
             name="Notes"
             value={form['Notes']}
             onChange={handleChange}
             rows={3}
-            placeholder="Brand, storage notes, allergies…"
+            placeholder={t('form.phNotes')}
           />
         </label>
 
         {mode === 'add' && <PhotoCapture photos={photos} onRemove={removePhoto} />}
 
         {error && <p className="error">{error}</p>}
-        {recognizeError && <p className="error">Recognition failed: {recognizeError}</p>}
-        {savedCount > 0 && <p className="form-saved-flash">✓ Saved ({savedCount} added)</p>}
+        {recognizeError && <p className="error">{t('form.recognizeError', { error: recognizeError })}</p>}
+        {savedCount > 0 && <p className="form-saved-flash">{t('form.savedFlash', { n: savedCount })}</p>}
 
         {mode === 'add' && (
           <input
@@ -309,18 +310,18 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
       <div className="form-bottom-bar">
         <div className="form-bottom-inner">
           <button type="button" className="btn-square btn-cancel" onClick={onCancel} disabled={!!saving}>
-            Cancel
+            {t('form.cancel')}
           </button>
 
           {mode === 'add' && photos.length > 0 && (
             <button type="button" className="btn-square btn-secondary" onClick={handleRecognize} disabled={recognizing}>
-              {recognizing ? '…' : 'Fill form'}
+              {recognizing ? t('form.recognizing') : t('form.fillForm')}
             </button>
           )}
 
           {mode === 'add' && photos.length < MAX_PHOTOS && (
             <button type="button" className="btn-square btn-secondary" onClick={openCamera}>
-              Take photo
+              {t('form.takePhoto')}
             </button>
           )}
 
@@ -331,7 +332,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
               onClick={handleAddNext}
               disabled={!!saving || !canAddNext}
             >
-              {saving === 'next' ? 'Saving…' : 'Add next'}
+              {saving === 'next' ? t('form.saving') : t('form.addNext')}
             </button>
           ) : (
             <button
@@ -340,7 +341,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
               onClick={() => formRef.current?.requestSubmit()}
               disabled={!!saving}
             >
-              {saving === 'save' ? 'Saving…' : 'Save'}
+              {saving === 'save' ? t('form.saving') : t('form.save')}
             </button>
           )}
         </div>

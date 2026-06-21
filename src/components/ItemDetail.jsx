@@ -1,4 +1,8 @@
+import { useLang } from '../i18n/index.jsx'
+
 export default function ItemDetail({ row, onEdit, onClose }) {
+  const { t } = useLang()
+
   function Field({ label, value }) {
     return (
       <div className="detail-field">
@@ -17,19 +21,19 @@ export default function ItemDetail({ row, onEdit, onClose }) {
         <h2 className="modal-title">{row['Title']}</h2>
 
         <div className="detail-grid">
-          <Field label="Category"       value={row['Category']} />
-          <Field label="Conditions"     value={row['Conditions']} />
-          <Field label="Quantity"       value={qty} />
-          <Field label="Expiration"     value={row['Expiration Date']} />
-          <Field label="Status"         value={row['Status']} />
-          <Field label="Box"            value={row['Box']} />
-          <Field label="Date Added"     value={row['Date Added']} />
-          <Field label="Notes"          value={row['Notes']} />
+          <Field label={t('detail.category')}  value={t('cat.' + row['Category']) || row['Category']} />
+          <Field label={t('detail.conditions')} value={row['Conditions']} />
+          <Field label={t('detail.quantity')}   value={qty} />
+          <Field label={t('detail.expiration')} value={row['Expiration Date']} />
+          <Field label={t('detail.status')}     value={t('status.' + row['Status']) || row['Status']} />
+          <Field label={t('detail.box')}        value={row['Box']} />
+          <Field label={t('detail.dateAdded')}  value={row['Date Added']} />
+          <Field label={t('detail.notes')}      value={row['Notes']} />
         </div>
 
         <div className="modal-actions">
-          <button onClick={onClose}>Close</button>
-          <button className="btn-primary" onClick={() => onEdit(row)}>Edit</button>
+          <button onClick={onClose}>{t('detail.close')}</button>
+          <button className="btn-primary" onClick={() => onEdit(row)}>{t('detail.edit')}</button>
         </div>
       </div>
     </div>

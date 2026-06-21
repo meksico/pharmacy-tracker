@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { getRows } from '../sheets.js'
+import { useLang } from '../i18n/index.jsx'
 import ItemForm from './ItemForm.jsx'
 import ItemDetail from './ItemDetail.jsx'
 
 function expiryClass(dateStr) {
   if (!dateStr) return ''
-  // Handle YYYY-MM (from month input) by treating it as the 1st of the month
   const normalized = /^\d{4}-\d{2}$/.test(dateStr) ? dateStr + '-01' : dateStr
   const expiry = new Date(normalized)
   if (isNaN(expiry)) return ''
@@ -16,6 +16,7 @@ function expiryClass(dateStr) {
 }
 
 export default function InventoryList() {
+  const { t } = useLang()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -92,11 +93,11 @@ export default function InventoryList() {
   return (
     <div className="inventory">
       <div className="inventory-toolbar">
-        <h2>Inventory ({rows.length} items)</h2>
+        <h2>{t('inv.heading', { n: rows.length })}</h2>
         <input
           className="search-input"
           type="search"
-          placeholder="Search by title…"
+          placeholder={t('inv.search')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -105,28 +106,28 @@ export default function InventoryList() {
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
-          <option value="">All categories</option>
-          {categories.map((c) => <option key={c}>{c}</option>)}
+          <option value="">{t('inv.allCategories')}</option>
+          {categories.map((c) => <option key={c} value={c}>{t('cat.' + c) || c}</option>)}
         </select>
-        <button className="btn-primary" onClick={handleAdd}>+ Add item</button>
+        <button className="btn-primary" onClick={handleAdd}>{t('inv.addItem')}</button>
       </div>
 
       {(expiringSoon.length > 0 || expired.length > 0) && (
         <div className="alert-bar">
           {expired.length > 0 && (
-            <span className="alert alert--expired">{expired.length} expired</span>
+            <span className="alert alert--expired">{t('inv.alertExpired', { n: expired.length })}</span>
           )}
           {expiringSoon.length > 0 && (
-            <span className="alert alert--soon">{expiringSoon.length} expiring within 30 days</span>
+            <span className="alert alert--soon">{t('inv.alertSoon', { n: expiringSoon.length })}</span>
           )}
         </div>
       )}
 
-      {loading && <p className="state-msg">Loading…</p>}
-      {error && <p className="error">Could not load inventory: {error}</p>}
+      {loading && <p className="state-msg">{t('inv.loading')}</p>}
+      {error && <p className="error">{t('inv.loadError', { error })}</p>}
 
       {!loading && !error && rows.length === 0 && (
-        <p className="state-msg">No items yet. Add your first medication above.</p>
+        <p className="state-msg">{t('inv.empty')}</p>
       )}
 
       {!loading && rows.length > 0 && (
@@ -135,11 +136,11 @@ export default function InventoryList() {
             <thead>
               <tr>
                 <th className="th-sortable" onClick={() => setSortDir((d) => d === 'asc' ? 'desc' : 'asc')}>
-                  Title {sortDir === 'asc' ? '↑' : '↓'}
+                  {t('inv.colTitle')} {sortDir === 'asc' ? '↑' : '↓'}
                 </th>
-                <th>Category</th>
-                <th>Expires</th>
-                <th>Box</th>
+                <th>{t('inv.colCategory')}</th>
+                <th>{t('inv.colExpires')}</th>
+                <th>{t('inv.colBox')}</th>
               </tr>
             </thead>
             <tbody>
@@ -150,7 +151,7 @@ export default function InventoryList() {
                   onClick={() => handleRowClick(row)}
                 >
                   <td>{row['Title']}</td>
-                  <td>{row['Category']}</td>
+                  <td>{t('cat.' + row['Category']) || row['Category']}</td>
                   <td>{row['Expiration Date']}</td>
                   <td>{row['Box']}</td>
                 </tr>
