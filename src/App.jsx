@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { initAuth, signIn, signOut } from './auth.js'
 import InventoryList from './components/InventoryList.jsx'
 import ExpiryDashboard from './components/ExpiryDashboard.jsx'
+import SymptomAdvisor from './components/SymptomAdvisor.jsx'
 
 // Possible values: 'loading' | 'ready' | 'signing-in' | 'allowed' | 'denied' | 'error'
 export default function App() {
@@ -113,9 +114,17 @@ export default function App() {
         >
           Expiring
         </button>
+        <button
+          className={`tab-btn${tab === 'advisor' ? ' tab-btn--active' : ''}`}
+          onClick={() => setTab('advisor')}
+        >
+          Advisor
+        </button>
       </nav>
       <main>
-        {tab === 'inventory' ? <InventoryList /> : <ExpiryDashboard />}
+        {tab === 'inventory' && <InventoryList />}
+        {tab === 'expiry' && <ExpiryDashboard />}
+        {tab === 'advisor' && <SymptomAdvisor />}
       </main>
     </div>
   )

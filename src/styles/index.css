@@ -127,6 +127,71 @@ main {
   border-bottom-color: #1e3a5f;
 }
 
+/* ── Symptom Advisor ─────────────────────────────────── */
+
+.advisor {
+  max-width: 640px;
+}
+
+.advisor-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.advisor-hint {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.advisor-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.advisor-textarea {
+  flex: 1;
+  resize: vertical;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.btn-mic {
+  font-size: 1.25rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.btn-mic--active {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.advisor-submit {
+  width: 100%;
+}
+
+.advisor-answer {
+  margin-top: 1.25rem;
+  padding: 1rem 1.1rem;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 /* ── Expiry dashboard ────────────────────────────────── */
 
 .expiry-section {
