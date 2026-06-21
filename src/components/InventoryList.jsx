@@ -23,6 +23,8 @@ export default function InventoryList() {
   const [editTarget, setEditTarget] = useState(null)
   const [detailTarget, setDetailTarget] = useState(null)
   const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [sortDir, setSortDir] = useState('asc')
 
   async function load() {
     setLoading(true)
@@ -77,9 +79,15 @@ export default function InventoryList() {
   const expiringSoon = rows.filter((r) => expiryClass(r['Expiration Date']) === 'row--expiring-soon')
   const expired = rows.filter((r) => expiryClass(r['Expiration Date']) === 'row--expired')
 
-  const visibleRows = search
-    ? rows.filter((r) => r['Title'].toLowerCase().includes(search.toLowerCase()))
-    : rows
+  const categories = [...new Set(rows.map((r) => r['Category']).filter(Boolean))].sort()
+
+  const visibleRows = rows
+    .filter((r) => !search || r['Title'].toLowerCase().includes(search.toLowerCase()))
+    .filter((r) => !categoryFilter || r['Category'] === categoryFilter)
+    .sort((a, b) => {
+      const cmp = a['Title'].localeCompare(b['Title'])
+      return sortDir === 'asc' ? cmp : -cmp
+    })
 
   return (
     <div className="inventory">
@@ -92,6 +100,14 @@ export default function InventoryList() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <select
+          className="category-filter"
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
+          <option value="">All categories</option>
+          {categories.map((c) => <option key={c}>{c}</option>)}
+        </select>
         <button className="btn-primary" onClick={handleAdd}>+ Add item</button>
       </div>
 
@@ -118,7 +134,9 @@ export default function InventoryList() {
           <table className="inventory-table">
             <thead>
               <tr>
-                <th>Title</th>
+                <th className="th-sortable" onClick={() => setSortDir((d) => d === 'asc' ? 'desc' : 'asc')}>
+                  Title {sortDir === 'asc' ? '↑' : '↓'}
+                </th>
                 <th>Category</th>
                 <th>Expires</th>
                 <th>Box</th>

@@ -184,11 +184,29 @@ button:disabled {
 }
 
 .search-input {
-  width: 220px;
+  width: 200px;
   padding: 0.4rem 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.875rem;
+}
+
+.category-filter {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: white;
+  cursor: pointer;
+}
+
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.th-sortable:hover {
+  background: #e8eef6;
 }
 
 .table-wrap {
