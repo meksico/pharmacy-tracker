@@ -8,7 +8,7 @@ import SymptomAdvisor from './components/SymptomAdvisor.jsx'
 export default function App() {
   const [status, setStatus] = useState('loading')
   const [userInfo, setUserInfo] = useState(null)
-  const [tab, setTab] = useState('inventory')
+  const [tab, setTab] = useState('advisor')
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -103,6 +103,12 @@ export default function App() {
       </header>
       <nav className="tab-nav">
         <button
+          className={`tab-btn${tab === 'advisor' ? ' tab-btn--active' : ''}`}
+          onClick={() => setTab('advisor')}
+        >
+          Advisor
+        </button>
+        <button
           className={`tab-btn${tab === 'inventory' ? ' tab-btn--active' : ''}`}
           onClick={() => setTab('inventory')}
         >
@@ -113,12 +119,6 @@ export default function App() {
           onClick={() => setTab('expiry')}
         >
           Expiring
-        </button>
-        <button
-          className={`tab-btn${tab === 'advisor' ? ' tab-btn--active' : ''}`}
-          onClick={() => setTab('advisor')}
-        >
-          Advisor
         </button>
       </nav>
       <main>
