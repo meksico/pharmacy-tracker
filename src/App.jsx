@@ -132,7 +132,12 @@ export default function App() {
         <h1>Home Pharmacy</h1>
         <div className="header-user">
           <LangToggle />
-          <span>{userInfo?.email}</span>
+          <div className="user-avatar" title={userInfo?.email}>
+            {userInfo?.picture
+              ? <img src={userInfo.picture} alt={userInfo?.name ?? userInfo?.email} />
+              : <span>{(userInfo?.name ?? userInfo?.email ?? '?')[0].toUpperCase()}</span>
+            }
+          </div>
           <button onClick={handleSignOut}>{t('app.signOut')}</button>
         </div>
       </header>
