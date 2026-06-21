@@ -681,14 +681,24 @@ textarea:focus {
     flex-direction: column;
   }
 
-  .mic-controls {
-    flex-direction: row;
-    align-items: center;
-  }
-
   .advisor-textarea {
+    width: 100%;
     font-size: 1rem;
     resize: none;
+  }
+
+  .mic-controls {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .mic-controls .btn-mic,
+  .mic-controls .lang-select {
+    height: 48px;
+    width: 48%;
+    font-size: 1rem;
+    border-radius: 8px;
   }
 
   .form-container {
