@@ -255,6 +255,17 @@ button:hover:not(:disabled) {
   background: #163058;
 }
 
+.btn-secondary {
+  background: white;
+  color: #1e3a5f;
+  border-color: #1e3a5f;
+  font-weight: 600;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #eef4ff;
+}
+
 .btn-signin {
   padding: 0.6rem 1.4rem;
   font-size: 1rem;
@@ -466,6 +477,17 @@ textarea:focus {
   margin-top: 1.4rem;
   padding-top: 1rem;
   border-top: 1px solid #eee;
+}
+
+.form-actions .btn-cancel {
+  margin-right: auto;
+}
+
+.form-saved-flash {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #16a34a;
 }
 
 /* ── Modal / item detail ─────────────────────────────── */
@@ -757,6 +779,34 @@ textarea:focus {
     padding: 1rem;
     border-radius: 0;
     box-shadow: none;
+  }
+
+  .form-container input,
+  .form-container select,
+  .form-container textarea {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .form-actions button {
+    width: 100%;
+    min-height: 44px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+
+  .form-actions .btn-primary { order: 1; }
+  .form-actions .btn-secondary { order: 2; }
+
+  .form-actions .btn-cancel {
+    order: 3;
+    margin-right: 0;
+    margin-top: 0.5rem;
   }
 
   .modal-box {

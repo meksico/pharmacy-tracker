@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { appendRow, updateRow } from '../sheets.js'
 import PhotoCapture from './PhotoCapture.jsx'
 
@@ -24,8 +24,10 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
     if (initialData) return { ...initialData }
     return { ...EMPTY_FORM, Box: localStorage.getItem(BOX_KEY) ?? '1' }
   })
-  const [saving, setSaving] = useState(false)
+  const [saving, setSaving] = useState(false) // false | 'save' | 'next'
   const [error, setError] = useState(null)
+  const [savedCount, setSavedCount] = useState(0)
+  const titleRef = useRef(null)
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -35,7 +37,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setSaving(true)
+    setSaving('save')
     setError(null)
     try {
       if (mode === 'add') {
@@ -51,7 +53,24 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
     }
   }
 
-  // Called when PhotoCapture returns recognised fields from the API
+  async function handleAddNext(e) {
+    e.preventDefault()
+    setSaving('next')
+    setError(null)
+    try {
+      const today = new Date().toISOString().slice(0, 10)
+      await appendRow({ ...form, 'Date Added': today })
+      const box = form['Box']
+      setForm({ ...EMPTY_FORM, Box: box })
+      setSavedCount((n) => n + 1)
+      setSaving(false)
+      setTimeout(() => titleRef.current?.focus(), 50)
+    } catch (err) {
+      setError(err.message)
+      setSaving(false)
+    }
+  }
+
   function handlePhotoResult(data) {
     setForm((prev) => ({
       ...prev,
@@ -71,12 +90,12 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
   return (
     <div className="form-container">
       <h2>{title}</h2>
-      {mode === 'add' && <PhotoCapture onResult={handlePhotoResult} />}
       <form onSubmit={handleSubmit}>
 
         <label>
           Title *
           <input
+            ref={titleRef}
             name="Title"
             value={form['Title']}
             onChange={handleChange}
@@ -164,14 +183,24 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
           />
         </label>
 
+        {mode === 'add' && <PhotoCapture onResult={handlePhotoResult} />}
+
         {error && <p className="error">{error}</p>}
+        {savedCount > 0 && (
+          <p className="form-saved-flash">✓ Saved ({savedCount} added)</p>
+        )}
 
         <div className="form-actions">
-          <button type="button" onClick={onCancel} disabled={saving}>
+          <button type="button" className="btn-cancel" onClick={onCancel} disabled={!!saving}>
             Cancel
           </button>
-          <button type="submit" className="btn-primary" disabled={saving}>
-            {saving ? 'Saving…' : submitLabel}
+          {mode === 'add' && (
+            <button type="button" className="btn-secondary" onClick={handleAddNext} disabled={!!saving}>
+              {saving === 'next' ? 'Saving…' : 'Add next item'}
+            </button>
+          )}
+          <button type="submit" className="btn-primary" disabled={!!saving}>
+            {saving === 'save' ? 'Saving…' : submitLabel}
           </button>
         </div>
       </form>
