@@ -20,6 +20,7 @@ export default function InventoryList() {
   const [error, setError] = useState(null)
   const [formMode, setFormMode] = useState(null) // null | 'add' | 'edit'
   const [editTarget, setEditTarget] = useState(null)
+  const [search, setSearch] = useState('')
 
   async function load() {
     setLoading(true)
@@ -65,10 +66,21 @@ export default function InventoryList() {
   const expiringSoon = rows.filter((r) => expiryClass(r['Expiration Date']) === 'row--expiring-soon')
   const expired = rows.filter((r) => expiryClass(r['Expiration Date']) === 'row--expired')
 
+  const visibleRows = search
+    ? rows.filter((r) => r['Title'].toLowerCase().includes(search.toLowerCase()))
+    : rows
+
   return (
     <div className="inventory">
       <div className="inventory-toolbar">
         <h2>Inventory ({rows.length} items)</h2>
+        <input
+          className="search-input"
+          type="search"
+          placeholder="Search by title…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         <button className="btn-primary" onClick={handleAdd}>+ Add item</button>
       </div>
 
@@ -107,7 +119,7 @@ export default function InventoryList() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {visibleRows.map((row) => (
                 <tr key={row._rowIndex} className={expiryClass(row['Expiration Date'])}>
                   <td>{row['Title']}</td>
                   <td>{row['Category']}</td>

@@ -183,6 +183,14 @@ button:disabled {
   font-weight: 600;
 }
 
+.search-input {
+  width: 220px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
 .table-wrap {
   overflow-x: auto;
 }
