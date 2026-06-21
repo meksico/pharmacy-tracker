@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { initAuth, signIn, signOut } from './auth.js'
 import InventoryList from './components/InventoryList.jsx'
+import ExpiryDashboard from './components/ExpiryDashboard.jsx'
 
 // Possible values: 'loading' | 'ready' | 'signing-in' | 'allowed' | 'denied' | 'error'
 export default function App() {
@@ -89,6 +90,9 @@ export default function App() {
     )
   }
 
+  // tab state lives here so switching tabs doesn't reset InventoryList search/sort
+  const [tab, setTab] = useState('inventory')
+
   return (
     <div className="app">
       <header className="app-header">
@@ -98,8 +102,22 @@ export default function App() {
           <button onClick={handleSignOut}>Sign out</button>
         </div>
       </header>
+      <nav className="tab-nav">
+        <button
+          className={`tab-btn${tab === 'inventory' ? ' tab-btn--active' : ''}`}
+          onClick={() => setTab('inventory')}
+        >
+          Inventory
+        </button>
+        <button
+          className={`tab-btn${tab === 'expiry' ? ' tab-btn--active' : ''}`}
+          onClick={() => setTab('expiry')}
+        >
+          Expiring
+        </button>
+      </nav>
       <main>
-        <InventoryList />
+        {tab === 'inventory' ? <InventoryList /> : <ExpiryDashboard />}
       </main>
     </div>
   )

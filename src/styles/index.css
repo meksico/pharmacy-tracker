@@ -95,6 +95,58 @@ main {
   flex: 1;
 }
 
+/* ── Tab navigation ──────────────────────────────────── */
+
+.tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 0 1.5rem;
+  background: white;
+}
+
+.tab-btn {
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  padding: 0.65rem 1.25rem;
+  margin-bottom: -2px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.tab-btn:hover:not(:disabled) {
+  background: none;
+  color: #1e3a5f;
+}
+
+.tab-btn--active {
+  color: #1e3a5f;
+  border-bottom-color: #1e3a5f;
+}
+
+/* ── Expiry dashboard ────────────────────────────────── */
+
+.expiry-section {
+  margin-bottom: 2rem;
+}
+
+.expiry-section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.65rem;
+}
+
+.expiry-section--expired .expiry-section-title {
+  color: #b71c1c;
+}
+
+.expiry-section--soon .expiry-section-title {
+  color: #e65100;
+}
+
 /* ── Buttons ─────────────────────────────────────────── */
 
 button {
