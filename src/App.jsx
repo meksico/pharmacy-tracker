@@ -19,7 +19,13 @@ export default function App() {
       if (window.google?.accounts?.oauth2) {
         clearInterval(interval)
         clearTimeout(timeout)
+
+        // If the auth callback never fires (e.g. silent-refresh popup blocked by Safari iOS),
+        // fall back to the sign-in button after 5 s instead of hanging forever.
+        const authTimeout = setTimeout(() => setStatus('ready'), 5000)
+
         initAuth(({ allowed, userInfo, needsButton, error }) => {
+          clearTimeout(authTimeout)
           if (needsButton) {
             setStatus('ready')
             return
