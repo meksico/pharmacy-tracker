@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { getRows, getHistory, appendHistory } from '../sheets.js'
 import { getOpenAIKey } from '../config.js'
+import { getUserInfo } from '../auth.js'
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 const hasSpeech = !!SpeechRecognition
@@ -117,7 +118,9 @@ export default function SymptomAdvisor() {
       setAnswer(text)
       setStatus('done')
 
-      const entry = { timestamp: new Date().toISOString(), symptoms: symptoms.trim(), answer: text }
+      const userInfo = getUserInfo()
+      const userId = userInfo?.email ?? userInfo?.sub ?? ''
+      const entry = { timestamp: new Date().toISOString(), symptoms: symptoms.trim(), answer: text, userId }
       appendHistory(entry).catch(() => {})
       setHistory((prev) => {
         const updated = [...prev, entry]

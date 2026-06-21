@@ -91,7 +91,7 @@ export async function appendRow(data) {
 }
 
 const HISTORY_SHEET = 'History'
-const HISTORY_RANGE = `${HISTORY_SHEET}!A2:C`
+const HISTORY_RANGE = `${HISTORY_SHEET}!A2:D`
 
 export async function getHistory() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(HISTORY_RANGE)}`
@@ -99,16 +99,16 @@ export async function getHistory() {
   if (!res.ok) return []
   const json = await res.json()
   const rows = json.values ?? []
-  return rows.slice(-20).map(([timestamp = '', symptoms = '', answer = '']) => ({ timestamp, symptoms, answer }))
+  return rows.slice(-20).map(([timestamp = '', symptoms = '', answer = '', userId = '']) => ({ timestamp, symptoms, answer, userId }))
 }
 
-export async function appendHistory({ symptoms, answer }) {
+export async function appendHistory({ symptoms, answer, userId = '' }) {
   const timestamp = new Date().toISOString()
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(HISTORY_RANGE)}:append?valueInputOption=USER_ENTERED`
   await fetch(url, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify({ values: [[timestamp, symptoms, answer]] }),
+    body: JSON.stringify({ values: [[timestamp, symptoms, answer, userId]] }),
   })
 }
 
