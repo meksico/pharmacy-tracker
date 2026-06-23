@@ -4,7 +4,6 @@ import { useLang } from './i18n/index.jsx'
 import InventoryList from './components/InventoryList.jsx'
 import ExpiryDashboard from './components/ExpiryDashboard.jsx'
 import SymptomAdvisor from './components/SymptomAdvisor.jsx'
-import { AppIcon } from './ds/components/brand/AppIcon.jsx'
 import { Button } from './ds/components/core/Button.jsx'
 import { Card } from './ds/components/core/Card.jsx'
 import { SegmentedControl } from './ds/components/navigation/SegmentedControl.jsx'
@@ -80,7 +79,7 @@ export default function App() {
           <SegmentedControl options={langOptions} value={lang} onChange={setLang} size="sm" />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, width: '100%', maxWidth: 400 }}>
-          <AppIcon line1="HOME" line2="PHARMACY" size={72} />
+          <img src="/apple-touch-icon.png" alt="Home Pharmacy" style={{ width: 72, height: 72, borderRadius: 'var(--radius-md)', display: 'block' }} />
           {children}
         </div>
       </div>
@@ -207,7 +206,7 @@ export default function App() {
           display: 'flex', alignItems: 'center', gap: 14,
           height: 64,
         }}>
-          <AppIcon line1="HOME" line2="PHARMACY" size={46} />
+          <img src="/apple-touch-icon.png" alt="Home Pharmacy" style={{ width: 46, height: 46, borderRadius: 'var(--radius-sm)', display: 'block', flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ font: 'var(--weight-bold) var(--text-md)/1 var(--font-expanded)', color: 'var(--grey-50)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase' }}>
               Home Pharmacy
