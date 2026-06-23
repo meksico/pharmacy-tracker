@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm install *)",
       "Bash(VITE_GOOGLE_CLIENT_ID=placeholder VITE_SHEET_ID=placeholder npm run build)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(convert --version)",
+      "Bash(python3 -c \"from PIL import Image; print\\('PIL ok'\\)\")"
     ]
   }
 }
