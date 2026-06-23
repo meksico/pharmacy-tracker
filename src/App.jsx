@@ -79,7 +79,7 @@ export default function App() {
           <SegmentedControl options={langOptions} value={lang} onChange={setLang} size="sm" />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, width: '100%', maxWidth: 400 }}>
-          <img src="/apple-touch-icon.png" alt="Home Pharmacy" style={{ width: 72, height: 72, borderRadius: 'var(--radius-md)', display: 'block' }} />
+          <img src={import.meta.env.BASE_URL + 'apple-touch-icon.png'} alt="Home Pharmacy" style={{ width: 72, height: 72, borderRadius: 'var(--radius-md)', display: 'block' }} />
           {children}
         </div>
       </div>
@@ -192,6 +192,8 @@ export default function App() {
   // ── Main app shell ─────────────────────────────────────────────────
   const initials = (userInfo?.name ?? userInfo?.email ?? '?')[0].toUpperCase()
 
+  const logoSrc = import.meta.env.BASE_URL + 'apple-touch-icon.png'
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
       {/* Header */}
@@ -201,12 +203,13 @@ export default function App() {
         boxShadow: 'var(--shadow-panel)',
         padding: '0 20px',
       }}>
+        {/* Row 1: logo + wordmark + avatar + sign-out */}
         <div style={{
           maxWidth: 920, margin: '0 auto',
           display: 'flex', alignItems: 'center', gap: 14,
           height: 64,
         }}>
-          <img src="/apple-touch-icon.png" alt="Home Pharmacy" style={{ width: 46, height: 46, borderRadius: 'var(--radius-sm)', display: 'block', flexShrink: 0 }} />
+          <img src={logoSrc} alt="Home Pharmacy" style={{ width: 46, height: 46, borderRadius: 'var(--radius-sm)', display: 'block', flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ font: 'var(--weight-bold) var(--text-md)/1 var(--font-expanded)', color: 'var(--grey-50)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase' }}>
               Home Pharmacy
@@ -217,7 +220,10 @@ export default function App() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-            <SegmentedControl options={langOptions} value={lang} onChange={setLang} size="sm" />
+            {/* Lang switcher — hidden on mobile, shown on desktop */}
+            <div className="header-lang-desktop">
+              <SegmentedControl options={langOptions} value={lang} onChange={setLang} size="sm" />
+            </div>
 
             <div
               title={userInfo?.email}
@@ -241,6 +247,11 @@ export default function App() {
               {t('app.signOut')}
             </Button>
           </div>
+        </div>
+
+        {/* Row 2: lang switcher on mobile only */}
+        <div className="header-lang-mobile" style={{ maxWidth: 920, margin: '0 auto' }}>
+          <SegmentedControl options={langOptions} value={lang} onChange={setLang} size="sm" />
         </div>
 
         {/* Tab bar */}

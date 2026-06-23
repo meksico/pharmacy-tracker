@@ -31,6 +31,16 @@
   vertical-align: middle;
 }
 
+/* ── Header: lang switcher row on mobile ────────────────────────────── */
+
+.header-lang-desktop { display: flex; }
+.header-lang-mobile  { display: none; }
+
+@media (max-width: 600px) {
+  .header-lang-desktop { display: none; }
+  .header-lang-mobile  { display: flex; justify-content: flex-end; padding-bottom: 8px; }
+}
+
 /* ── Responsive: show table on desktop, cards on mobile ─────────────── */
 
 /* Desktop: show table, hide cards */
