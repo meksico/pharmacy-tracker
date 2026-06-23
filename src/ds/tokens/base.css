@@ -1,0 +1,41 @@
+/* ── BASE / RESET ─────────────────────────────────────────────────────
+   Minimal, opinionated reset establishing the chassis surface and the
+   default typographic voice. Applied when a consumer links styles.css.   */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font: var(--type-body);
+  /* Subtle brushed-aluminum tooth — flat fallback if gradients unwanted */
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.012) 0px,
+      rgba(0,0,0,0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-sans); color: var(--text-primary); }
+p { margin: 0; }
+
+/* Selection picks up the critical accent */
+::selection { background: var(--orange-500); color: var(--grey-0); }
+
+/* Focus discipline: a hard, visible ring — no soft glow */
+:focus-visible {
+  outline: var(--border-width-strong) solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+a { color: var(--text-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }

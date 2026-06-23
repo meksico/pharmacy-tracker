@@ -3,6 +3,11 @@ import { getRows, getHistory, appendHistory } from '../sheets.js'
 import { getOpenAIKey } from '../config.js'
 import { getUserInfo } from '../auth.js'
 import { useLang } from '../i18n/index.jsx'
+import { Button } from '../ds/components/core/Button.jsx'
+import { IconButton } from '../ds/components/core/IconButton.jsx'
+import { Badge } from '../ds/components/core/Badge.jsx'
+import { Card } from '../ds/components/core/Card.jsx'
+import { TapeReel } from '../ds/components/data/TapeReel.jsx'
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 const hasSpeech = !!SpeechRecognition
@@ -14,6 +19,20 @@ function fmtTimestamp(iso) {
   const s = String(d.getSeconds()).padStart(2, '0')
   return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()} ${d.getHours()}:${m}:${s}`
 }
+
+// Mic SVG glyph
+const MicIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
+    <rect x="9" y="2" width="6" height="12" rx="3"/>
+    <path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>
+  </svg>
+)
+
+const StopIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: '100%', height: '100%' }}>
+    <rect x="5" y="5" width="14" height="14" rx="2"/>
+  </svg>
+)
 
 export default function SymptomAdvisor() {
   const { lang, t } = useLang()
@@ -38,7 +57,7 @@ export default function SymptomAdvisor() {
     }
     const recog = new SpeechRecognition()
     recog.lang = t('adv.speechLang')
-    recog.interimResults = true  // iOS never fires final result without this
+    recog.interimResults = true
     recog.continuous = false
 
     let sessionText = ''
@@ -133,81 +152,138 @@ export default function SymptomAdvisor() {
   }
 
   return (
-    <div className="advisor">
-      <h2 className="advisor-title">{t('adv.title')}</h2>
-      <p className="advisor-hint">{t('adv.hint')}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Title */}
+      <div>
+        <h2 style={{ font: 'var(--weight-bold) var(--type-heading) var(--font-expanded)', color: 'var(--text-primary)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase', margin: '0 0 6px' }}>
+          {t('adv.title')}
+        </h2>
+        <p style={{ font: 'var(--weight-regular) var(--text-sm)/1.5 var(--font-sans)', color: 'var(--text-secondary)', margin: 0 }}>
+          {t('adv.hint')}
+        </p>
+      </div>
 
-      <div className="advisor-input-row">
+      {/* Input row */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
         <textarea
-          className="advisor-textarea"
           rows={3}
           placeholder={t('adv.placeholder')}
           value={symptoms}
           onChange={(e) => setSymptoms(e.target.value)}
+          style={{
+            flex: 1,
+            resize: 'vertical',
+            padding: '10px 12px',
+            background: 'var(--grey-50)',
+            border: '1px solid var(--border-channel)',
+            borderRadius: 'var(--radius-sm)',
+            boxShadow: 'var(--shadow-inset)',
+            font: 'var(--weight-regular) var(--text-sm)/1.5 var(--font-sans)',
+            color: 'var(--text-primary)',
+            outline: 'none',
+          }}
         />
         {hasSpeech && (
-          <div className="mic-controls">
-            <button
-              type="button"
-              className={`btn-mic${listening ? ' btn-mic--active' : ''}`}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, paddingTop: 2 }}>
+            <IconButton
+              variant="surface"
+              size="md"
+              active={listening}
+              aria-label={listening ? t('adv.stopRecording') : t('adv.startRecording')}
               onClick={toggleMic}
-              title={listening ? t('adv.stopRecording') : t('adv.startRecording')}
             >
-              {listening ? '⏹' : '🎙'}
-            </button>
+              {listening ? <StopIcon /> : <MicIcon />}
+            </IconButton>
+            {listening && (
+              <Badge variant="live" dot>REC</Badge>
+            )}
           </div>
         )}
       </div>
 
-      <button
-        className="btn-primary advisor-submit"
+      {/* Submit */}
+      <Button
+        variant="routine"
+        size="lg"
         onClick={handleSubmit}
         disabled={status === 'loading' || !symptoms.trim()}
+        style={{ color: 'var(--grey-50)', alignSelf: 'flex-start' }}
       >
         {status === 'loading' ? t('adv.checking') : t('adv.find')}
-      </button>
+      </Button>
 
-      {status === 'done' && answer && (
-        <div className="advisor-answer">
-          <p>{answer}</p>
+      {/* Loading */}
+      {status === 'loading' && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '24px 0' }}>
+          <TapeReel spinning size={100} label="···" />
+          <p style={{ font: 'var(--weight-medium) var(--text-xs)/1 var(--font-mono)', color: 'var(--text-secondary)', letterSpacing: 'var(--tracking-mono)', textTransform: 'uppercase', margin: 0 }}>
+            Перевіряю аптечку
+          </p>
         </div>
       )}
 
+      {/* Answer */}
+      {status === 'done' && answer && (
+        <Card variant="screen" label="ПОРАДА" style={{ marginTop: 4 }}>
+          <p style={{ font: 'var(--weight-regular) var(--text-sm)/1.6 var(--font-sans)', color: 'var(--grey-50)', whiteSpace: 'pre-line', margin: '8px 0 0' }}>
+            {answer}
+          </p>
+        </Card>
+      )}
+
+      {/* Error */}
       {status === 'error' && (
-        <p className="error" style={{ marginTop: '1rem' }}>
+        <p style={{ font: 'var(--weight-medium) var(--text-xs)/1.5 var(--font-mono)', color: 'var(--text-secondary)', margin: 0 }}>
           {errorMsg}
         </p>
       )}
 
+      {/* History */}
       {history.length > 0 && (
-        <div className="advisor-history">
-          <p className="advisor-history-title">{t('adv.history')}</p>
-          {[...history].reverse().map((entry, i) => {
-            const idx = history.length - 1 - i
-            const isActive = activeHistoryIdx === idx
-            const label = fmtTimestamp(entry.timestamp)
-            return (
-              <div
-                key={entry.timestamp + i}
-                className={`history-entry${isActive ? ' history-entry--active' : ''}`}
-                onClick={() => {
-                  if (isActive) {
-                    setActiveHistoryIdx(null)
-                    setAnswer(null)
-                    setStatus('idle')
-                  } else {
-                    setActiveHistoryIdx(idx)
-                    setSymptoms(entry.symptoms)
-                    setAnswer(entry.answer)
-                    setStatus('done')
-                  }
-                }}
-              >
-                <span className="history-entry-time">{label}</span>
-                <span className="history-entry-preview">{entry.symptoms}</span>
-              </div>
-            )
-          })}
+        <div style={{ marginTop: 8 }}>
+          <p style={{ font: 'var(--weight-semibold) var(--text-xs)/1 var(--font-mono)', color: 'var(--text-secondary)', letterSpacing: 'var(--tracking-wide)', textTransform: 'uppercase', margin: '0 0 12px' }}>
+            {t('adv.history')}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {[...history].reverse().map((entry, i) => {
+              const idx = history.length - 1 - i
+              const isActive = activeHistoryIdx === idx
+              return (
+                <div
+                  key={entry.timestamp + i}
+                  onClick={() => {
+                    if (isActive) {
+                      setActiveHistoryIdx(null)
+                      setAnswer(null)
+                      setStatus('idle')
+                    } else {
+                      setActiveHistoryIdx(idx)
+                      setSymptoms(entry.symptoms)
+                      setAnswer(entry.answer)
+                      setStatus('done')
+                    }
+                  }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 14px',
+                    background: 'var(--surface-raised)',
+                    border: `1px solid ${isActive ? 'var(--border-strong)' : 'rgba(0,0,0,0.14)'}`,
+                    borderRadius: 'var(--radius-sm)',
+                    boxShadow: isActive ? 'var(--shadow-key-pressed)' : 'var(--shadow-key)',
+                    cursor: 'pointer',
+                    transition: 'box-shadow var(--dur-fast) var(--ease-mech)',
+                  }}
+                >
+                  <span style={{ font: 'var(--weight-medium) var(--text-xs)/1 var(--font-mono)', color: 'var(--text-secondary)', letterSpacing: 'var(--tracking-mono)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                    {fmtTimestamp(entry.timestamp)}
+                  </span>
+                  <span style={{ font: 'var(--weight-regular) var(--text-sm)/1 var(--font-sans)', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {entry.symptoms}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
     </div>

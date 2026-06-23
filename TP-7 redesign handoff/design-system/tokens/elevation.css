@@ -1,0 +1,57 @@
+/* ── ELEVATION, RADII & MOTION ────────────────────────────────────────
+   Depth simulates physical material. Keys are raised (light top edge +
+   soft drop); pressed keys invert to an inset shadow. Radii are small and
+   mechanical — no soft, friendly rounding.                               */
+
+:root {
+  /* ---- Corner radii (tight, machined) ---- */
+  --radius-0:   0;       /* hard frame edges                    */
+  --radius-sm:  2px;     /* default key / card                  */
+  --radius-md:  4px;     /* panels                              */
+  --radius-lg:  8px;     /* large module                        */
+  --radius-pill: 999px;  /* indicators, dots                    */
+
+  /* ---- Borders ---- */
+  --border-width: 1px;
+  --border-width-strong: 1.5px;
+
+  /* ---- Tactile elevation ----
+     Raised key: bright bevel on top, contact shadow below.            */
+  --shadow-key:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -1px 0 rgba(0,0,0,0.10),
+    0 1px 1px rgba(0,0,0,0.18),
+    0 2px 4px rgba(0,0,0,0.10);
+
+  --shadow-key-hover:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    inset 0 -1px 0 rgba(0,0,0,0.12),
+    0 2px 3px rgba(0,0,0,0.20),
+    0 4px 8px rgba(0,0,0,0.12);
+
+  /* Pressed: switch depressed → recessed inset, no drop.              */
+  --shadow-key-pressed:
+    inset 0 2px 4px rgba(0,0,0,0.28),
+    inset 0 -1px 0 rgba(255,255,255,0.4);
+
+  /* Recessed well — screens, channels, input fields.                 */
+  --shadow-inset:
+    inset 0 1px 3px rgba(0,0,0,0.30),
+    inset 0 -1px 0 rgba(255,255,255,0.5);
+
+  /* Floating panel — dialogs, menus, toasts.                         */
+  --shadow-panel:
+    0 1px 0 rgba(255,255,255,0.6),
+    0 4px 10px rgba(0,0,0,0.20),
+    0 16px 40px rgba(0,0,0,0.24);
+
+  /* ---- Motion — mechanical resistance, not slick easing ----
+     Short, slightly snappy. Press feedback is near-instant.          */
+  /* firm, weighted */
+  --ease-mech:  cubic-bezier(0.2, 0.0, 0.1, 1); /* @kind other */
+  /* tiny over-travel */
+  --ease-detent: cubic-bezier(0.3, 1.4, 0.5, 1); /* @kind other */
+  --dur-press:  60ms; /* @kind other */
+  --dur-fast:   120ms; /* @kind other */
+  --dur-base:   180ms; /* @kind other */
+}

@@ -1,0 +1,26 @@
+/* ── SPACING & GRID ───────────────────────────────────────────────────
+   Hard grid. Functional density: components sit close, like parts on a
+   circuit board. Base unit is 4px; the system favours tight, even gaps.  */
+
+:root {
+  --space-0:  0;
+  --space-1:  2px;   /* hairline gap between fused controls    */
+  --space-2:  4px;   /* base unit                              */
+  --space-3:  8px;   /* tight grouping                         */
+  --space-4:  12px;  /* control padding                        */
+  --space-5:  16px;  /* default block gap                      */
+  --space-6:  24px;  /* section padding                        */
+  --space-7:  32px;  /* major section gap                      */
+  --space-8:  48px;  /* page margin                            */
+  --space-9:  64px;
+
+  /* Control sizing — physical key dimensions */
+  --control-h-sm: 28px;
+  --control-h:    36px;   /* standard tactile key height        */
+  --control-h-lg: 48px;
+  --key-min-w:    44px;   /* min hit target                     */
+
+  /* Layout */
+  --grid-gutter:  var(--space-5);
+  --container-max: 1200px;
+}

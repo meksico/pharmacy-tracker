@@ -1,0 +1,11 @@
+/* ── Webfonts ─────────────────────────────────────────────────────────
+   TP-7 Core typography.
+   SUBSTITUTION NOTE: Teenage Engineering's hardware uses a proprietary
+   neo-grotesque + a custom segmented LED display face. Those binaries are
+   not redistributable, so we ship the closest open equivalents:
+     · Archivo        → neo-grotesque UI / labels   (substitute for HelveticaNeue/SF Pro)
+     · JetBrains Mono → technical readout / telemetry (substitute for SF Mono)
+   Replace these @import/@font-face declarations with the licensed faces
+   for production. */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Expanded:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');

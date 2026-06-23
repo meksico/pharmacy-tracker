@@ -2,6 +2,10 @@ import { useState, useRef } from 'react'
 import { appendRow, updateRow } from '../sheets.js'
 import { getOpenAIKey } from '../config.js'
 import { useLang } from '../i18n/index.jsx'
+import { Button } from '../ds/components/core/Button.jsx'
+import { Input } from '../ds/components/forms/Input.jsx'
+import { Select } from '../ds/components/forms/Select.jsx'
+import { TapeReel } from '../ds/components/data/TapeReel.jsx'
 import PhotoCapture from './PhotoCapture.jsx'
 
 const CATEGORIES = ['Pain Relief', 'Wound Care', 'Cold & Flu', 'Digestive', 'Allergy', 'Other']
@@ -53,11 +57,6 @@ function resizeImage(file) {
   })
 }
 
-function filledClass(val) {
-  if (val == null || val === '') return ''
-  return 'field--filled'
-}
-
 export default function ItemForm({ mode, initialData, onSave, onCancel }) {
   const { t } = useLang()
 
@@ -65,7 +64,7 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
     if (initialData) return { ...initialData }
     return { ...EMPTY_FORM, Box: localStorage.getItem(BOX_KEY) ?? '1' }
   })
-  const [saving, setSaving] = useState(false) // false | 'save' | 'next'
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const [savedCount, setSavedCount] = useState(0)
 
@@ -187,114 +186,135 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
     }
   }
 
+  const monoLabelStyle = {
+    font: 'var(--weight-semibold) var(--text-xs)/1 var(--font-sans)',
+    letterSpacing: 'var(--tracking-label)',
+    textTransform: 'uppercase',
+    color: 'var(--text-secondary)',
+    display: 'block',
+    marginBottom: 6,
+  }
+
   return (
-    <div className="form-container">
-      <h2>{mode === 'add' ? t('form.addTitle') : t('form.editTitle')}</h2>
-      <form ref={formRef} onSubmit={handleSubmit}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <h2 style={{ font: 'var(--weight-bold) var(--type-heading) var(--font-expanded)', color: 'var(--text-primary)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase', margin: '0 0 20px' }}>
+        {mode === 'add' ? t('form.addTitle') : t('form.editTitle')}
+      </h2>
 
-        <label>
-          {t('form.labelTitle')}{mode === 'add' ? ' *' : ''}
-          <input
-            ref={titleRef}
-            className={filledClass(form['Title'])}
-            name="Title"
-            value={form['Title']}
+      <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+        <Input
+          ref={titleRef}
+          label={`${t('form.labelTitle')}${mode === 'add' ? ' *' : ''}`}
+          name="Title"
+          value={form['Title']}
+          onChange={handleChange}
+          placeholder={t('form.phTitle')}
+          required
+        />
+
+        <Select label={t('form.labelCategory')} name="Category" value={form['Category']} onChange={handleChange}>
+          {CATEGORIES.map((c) => <option key={c} value={c}>{t('cat.' + c)}</option>)}
+        </Select>
+
+        <Input
+          label={t('form.labelConditions')}
+          name="Conditions"
+          value={form['Conditions']}
+          onChange={handleChange}
+          placeholder={t('form.phConditions')}
+        />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <Input
+            label={t('form.labelQuantity')}
+            name="Quantity"
+            type="number"
+            min="0"
+            mono
+            value={form['Quantity']}
             onChange={handleChange}
-            placeholder={t('form.phTitle')}
-            required
           />
-        </label>
-
-        <label>
-          {t('form.labelCategory')}
-          <select className={filledClass(form['Category'])} name="Category" value={form['Category']} onChange={handleChange}>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{t('cat.' + c)}</option>)}
-          </select>
-        </label>
-
-        <label>
-          {t('form.labelConditions')}
-          <input
-            className={filledClass(form['Conditions'])}
-            name="Conditions"
-            value={form['Conditions']}
+          <Input
+            label={t('form.labelUnit')}
+            name="Unit"
+            value={form['Unit']}
             onChange={handleChange}
-            placeholder={t('form.phConditions')}
+            placeholder={t('form.phUnit')}
           />
-        </label>
-
-        <div className="form-row">
-          <label>
-            {t('form.labelQuantity')}
-            <input
-              className={filledClass(form['Quantity'])}
-              name="Quantity"
-              type="number"
-              min="0"
-              value={form['Quantity']}
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            {t('form.labelUnit')}
-            <input
-              className={filledClass(form['Unit'])}
-              name="Unit"
-              value={form['Unit']}
-              onChange={handleChange}
-              placeholder={t('form.phUnit')}
-            />
-          </label>
         </div>
 
-        <label>
-          {t('form.labelExpDate')}{mode === 'add' ? ' *' : ''}
-          <input
-            className={filledClass(form['Expiration Date'])}
-            name="Expiration Date"
-            type="month"
-            value={form['Expiration Date']}
+        <Input
+          label={`${t('form.labelExpDate')}${mode === 'add' ? ' *' : ''}`}
+          name="Expiration Date"
+          type="month"
+          mono
+          value={form['Expiration Date']}
+          onChange={handleChange}
+        />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <Select label={t('form.labelStatus')} name="Status" value={form['Status']} onChange={handleChange}>
+            {STATUSES.map((s) => <option key={s} value={s}>{t('status.' + s)}</option>)}
+          </Select>
+          <Input
+            label={t('form.labelBox')}
+            name="Box"
+            type="number"
+            min="1"
+            mono
+            value={form['Box']}
             onChange={handleChange}
           />
-        </label>
-
-        <div className="form-row">
-          <label>
-            {t('form.labelStatus')}
-            <select className={filledClass(form['Status'])} name="Status" value={form['Status']} onChange={handleChange}>
-              {STATUSES.map((s) => <option key={s} value={s}>{t('status.' + s)}</option>)}
-            </select>
-          </label>
-          <label>
-            {t('form.labelBox')}
-            <input
-              className={filledClass(form['Box'])}
-              name="Box"
-              type="number"
-              min="1"
-              value={form['Box']}
-              onChange={handleChange}
-            />
-          </label>
         </div>
 
-        <label>
-          {t('form.labelNotes')}
+        {/* Notes — recessed multiline well */}
+        <div>
+          <span style={monoLabelStyle}>{t('form.labelNotes')}</span>
           <textarea
-            className={filledClass(form['Notes'])}
             name="Notes"
             value={form['Notes']}
             onChange={handleChange}
             rows={3}
             placeholder={t('form.phNotes')}
+            style={{
+              width: '100%', boxSizing: 'border-box', resize: 'vertical',
+              padding: '10px 12px',
+              background: 'var(--grey-50)',
+              border: '1px solid var(--border-channel)',
+              borderRadius: 'var(--radius-sm)',
+              boxShadow: 'var(--shadow-inset)',
+              font: 'var(--weight-regular) var(--text-sm)/1.5 var(--font-sans)',
+              color: 'var(--text-primary)',
+              outline: 'none',
+            }}
           />
-        </label>
+        </div>
 
         {mode === 'add' && <PhotoCapture photos={photos} onRemove={removePhoto} />}
 
-        {error && <p className="error">{error}</p>}
-        {recognizeError && <p className="error">{t('form.recognizeError', { error: recognizeError })}</p>}
-        {savedCount > 0 && <p className="form-saved-flash">{t('form.savedFlash', { n: savedCount })}</p>}
+        {recognizing && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <TapeReel spinning size={36} />
+            <span style={{ font: 'var(--weight-medium) var(--text-xs)/1 var(--font-mono)', color: 'var(--text-secondary)', letterSpacing: 'var(--tracking-mono)', textTransform: 'uppercase' }}>OCR</span>
+          </div>
+        )}
+
+        {error && (
+          <p style={{ font: 'var(--weight-medium) var(--text-xs)/1 var(--font-mono)', color: 'var(--text-secondary)', margin: 0 }}>
+            {error}
+          </p>
+        )}
+        {recognizeError && (
+          <p style={{ font: 'var(--weight-medium) var(--text-xs)/1 var(--font-mono)', color: 'var(--text-secondary)', margin: 0 }}>
+            {t('form.recognizeError', { error: recognizeError })}
+          </p>
+        )}
+        {savedCount > 0 && (
+          <p style={{ font: 'var(--weight-medium) var(--text-xs)/1 var(--font-mono)', color: 'var(--text-tertiary)', margin: 0 }}>
+            {t('form.savedFlash', { n: savedCount })}
+          </p>
+        )}
 
         {mode === 'add' && (
           <input
@@ -307,44 +327,52 @@ export default function ItemForm({ mode, initialData, onSave, onCancel }) {
         )}
       </form>
 
-      <div className="form-bottom-bar">
-        <div className="form-bottom-inner">
-          <button type="button" className="btn-square btn-cancel" onClick={onCancel} disabled={!!saving}>
-            {t('form.cancel')}
-          </button>
+      {/* Sticky bottom action bar */}
+      <div style={{
+        position: 'sticky', bottom: 0,
+        background: 'var(--bg-primary)',
+        borderTop: '1px solid var(--border-hairline)',
+        marginTop: 20,
+        padding: '14px 0 4px',
+        display: 'flex', gap: 8, flexWrap: 'wrap',
+      }}>
+        <Button variant="ghost" type="button" onClick={onCancel} disabled={!!saving}>
+          {t('form.cancel')}
+        </Button>
 
-          {mode === 'add' && photos.length > 0 && (
-            <button type="button" className="btn-square btn-secondary" onClick={handleRecognize} disabled={recognizing}>
-              {recognizing ? t('form.recognizing') : t('form.fillForm')}
-            </button>
-          )}
+        {mode === 'add' && photos.length > 0 && (
+          <Button variant="surface" type="button" onClick={handleRecognize} disabled={recognizing}>
+            {recognizing ? t('form.recognizing') : t('form.fillForm')}
+          </Button>
+        )}
 
-          {mode === 'add' && photos.length < MAX_PHOTOS && (
-            <button type="button" className="btn-square btn-secondary" onClick={openCamera}>
-              {t('form.takePhoto')}
-            </button>
-          )}
+        {mode === 'add' && photos.length < MAX_PHOTOS && (
+          <Button variant="surface" type="button" onClick={openCamera}>
+            {t('form.takePhoto')}
+          </Button>
+        )}
 
-          {mode === 'add' ? (
-            <button
-              type="button"
-              className="btn-square btn-primary"
-              onClick={handleAddNext}
-              disabled={!!saving || !canAddNext}
-            >
-              {saving === 'next' ? t('form.saving') : t('form.addNext')}
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn-square btn-primary"
-              onClick={() => formRef.current?.requestSubmit()}
-              disabled={!!saving}
-            >
-              {saving === 'save' ? t('form.saving') : t('form.save')}
-            </button>
-          )}
-        </div>
+        {mode === 'add' ? (
+          <Button
+            variant="routine"
+            type="button"
+            onClick={handleAddNext}
+            disabled={!!saving || !canAddNext}
+            style={{ color: 'var(--grey-50)', marginLeft: 'auto' }}
+          >
+            {saving === 'next' ? t('form.saving') : t('form.addNext')}
+          </Button>
+        ) : (
+          <Button
+            variant="routine"
+            type="button"
+            onClick={() => formRef.current?.requestSubmit()}
+            disabled={!!saving}
+            style={{ color: 'var(--grey-50)', marginLeft: 'auto' }}
+          >
+            {saving === 'save' ? t('form.saving') : t('form.save')}
+          </Button>
+        )}
       </div>
     </div>
   )

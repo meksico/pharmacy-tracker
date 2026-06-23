@@ -1,0 +1,63 @@
+/* ── TYPOGRAPHY ───────────────────────────────────────────────────────
+   Two voices:
+     · Sans (Archivo)        — labels, menus, body. Geometric neo-grotesque.
+     · Mono (JetBrains Mono)  — counters, timers, telemetry. "Etched" data.
+   Technical data uses open tracking + uppercase for the engraved-metal look. */
+
+:root {
+  /* ---- Families ---- */
+  --font-sans: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-expanded: 'Archivo Expanded', 'Archivo', sans-serif; /* display / branding */
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+
+  /* ---- Weights ---- */
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold: 600;
+  --weight-bold:    700;
+
+  /* ---- Type scale (px → rem @16) ---- */
+  --text-2xs:  0.625rem;  /* 10 — unit ticks, micro labels      */
+  --text-xs:   0.6875rem; /* 11 — etched secondary labels       */
+  --text-sm:   0.8125rem; /* 13 — UI body, controls             */
+  --text-md:   0.9375rem; /* 15 — body                          */
+  --text-lg:   1.125rem;  /* 18 — emphasised body / small head  */
+  --text-xl:   1.5rem;    /* 24 — section heads                 */
+  --text-2xl:  2rem;      /* 32 — display                       */
+  --text-3xl:  3rem;      /* 48 — hero / counter                */
+  --text-4xl:  4.5rem;    /* 72 — large telemetry readout       */
+
+  /* ---- Line-height ---- */
+  --leading-tight: 1.05;
+  --leading-snug:  1.2;
+  --leading-body:  1.5;
+
+  /* ---- Tracking (the "engraved" lever) ---- */
+  --tracking-tight:  -0.01em;
+  --tracking-normal: 0;
+  --tracking-label:  0.06em;   /* uppercase UI labels            */
+  --tracking-wide:   0.12em;   /* technical / etched metadata    */
+  --tracking-mono:   0.04em;   /* counters, telemetry            */
+
+  /* ---- Composite semantic roles ---- */
+  --type-display:    var(--weight-bold) var(--text-2xl)/var(--leading-tight) var(--font-expanded);
+  --type-heading:    var(--weight-semibold) var(--text-xl)/var(--leading-snug) var(--font-sans);
+  --type-body:       var(--weight-regular) var(--text-md)/var(--leading-body) var(--font-sans);
+  --type-ui:         var(--weight-medium) var(--text-sm)/1.3 var(--font-sans);
+  --type-readout:    var(--weight-medium) var(--text-2xl)/1 var(--font-mono);
+}
+
+/* Utility: uppercase etched technical label */
+.tp-label {
+  font: var(--weight-semibold) var(--text-xs)/1 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--text-secondary);
+}
+
+/* Utility: monospace telemetry readout */
+.tp-readout {
+  font-family: var(--font-mono);
+  letter-spacing: var(--tracking-mono);
+  font-variant-numeric: tabular-nums;
+}
